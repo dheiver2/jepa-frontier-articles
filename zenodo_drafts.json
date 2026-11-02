@@ -1,0 +1,72 @@
+{
+  "artigo_01_collapse": {
+    "id": 23890644,
+    "draft_url": "https://zenodo.org/deposit/23890644",
+    "reserved_doi": "10.5281/zenodo.23890644",
+    "doi": "10.5281/zenodo.23890644",
+    "record_url": "https://zenodo.org/record/23890644"
+  },
+  "artigo_02_world_model": {
+    "id": 23890647,
+    "draft_url": "https://zenodo.org/deposit/23890647",
+    "reserved_doi": "10.5281/zenodo.23890647",
+    "doi": "10.5281/zenodo.23890647",
+    "record_url": "https://zenodo.org/record/23890647"
+  },
+  "artigo_03_causal": {
+    "id": 23890650,
+    "draft_url": "https://zenodo.org/deposit/23890650",
+    "reserved_doi": "10.5281/zenodo.23890650",
+    "doi": "10.5281/zenodo.23890650",
+    "record_url": "https://zenodo.org/record/23890650"
+  },
+  "artigo_04_language_reasoning": {
+    "id": 23890654,
+    "draft_url": "https://zenodo.org/deposit/23890654",
+    "reserved_doi": "10.5281/zenodo.23890654",
+    "doi": "10.5281/zenodo.23890654",
+    "record_url": "https://zenodo.org/record/23890654"
+  },
+  "artigo_05_hierarchical": {
+    "id": 23890658,
+    "draft_url": "https://zenodo.org/deposit/23890658",
+    "reserved_doi": "10.5281/zenodo.23890658",
+    "doi": "10.5281/zenodo.23890658",
+    "record_url": "https://zenodo.org/record/23890658"
+  },
+  "artigo_06_scaling": {
+    "id": 23890660,
+    "draft_url": "https://zenodo.org/deposit/23890660",
+    "reserved_doi": "10.5281/zenodo.23890660",
+    "doi": "10.5281/zenodo.23890660",
+    "record_url": "https://zenodo.org/record/23890660"
+  },
+  "artigo_07_uncertainty": {
+    "id": 23890662,
+    "draft_url": "https://zenodo.org/deposit/23890662",
+    "reserved_doi": "10.5281/zenodo.23890662",
+    "doi": "10.5281/zenodo.23890662",
+    "record_url": "https://zenodo.org/record/23890662"
+  },
+  "artigo_08_ecg": {
+    "id": 23890664,
+    "draft_url": "https://zenodo.org/deposit/23890664",
+    "reserved_doi": "10.5281/zenodo.23890664",
+    "doi": "10.5281/zenodo.23890664",
+    "record_url": "https://zenodo.org/record/23890664"
+  },
+  "artigo_09_shift": {
+    "id": 23890666,
+    "draft_url": "https://zenodo.org/deposit/23890666",
+    "reserved_doi": "10.5281/zenodo.23890666",
+    "doi": "10.5281/zenodo.23890666",
+    "record_url": "https://zenodo.org/record/23890666"
+  },
+  "artigo_10_probing": {
+    "id": 23890668,
+    "draft_url": "https://zenodo.org/deposit/23890668",
+    "reserved_doi": "10.5281/zenodo.23890668",
+    "doi": "10.5281/zenodo.23890668",
+    "record_url": "https://zenodo.org/record/23890668"
+  }
+}

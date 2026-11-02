@@ -1,0 +1,8 @@
+*.aux
+*.bbl
+*.log
+*.blg
+*.out
+__pycache__/
+experiments/refs_backup_before_ieee.bib
+.DS_Store

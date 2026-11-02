@@ -1,0 +1,11 @@
+Experiment 1 (simulation arm), 45 runs. Mean and 95% bootstrap CI over seeds.
+
+EMA     d= 2 n=5  id_gap=  0.27 [  0.25,   0.29]  eff_rank=  2.79
+EMA     d= 8 n=5  id_gap=  0.70 [  0.65,   0.77]  eff_rank= 15.29
+EMA     d=32 n=5  id_gap= 11.89 [ 11.63,  12.14]  eff_rank= 25.18
+VICReg  d= 2 n=5  id_gap=  0.31 [  0.30,   0.32]  eff_rank= 19.96
+VICReg  d= 8 n=5  id_gap=  1.43 [  1.39,   1.49]  eff_rank= 49.61
+VICReg  d=32 n=5  id_gap=  8.68 [  8.44,   8.93]  eff_rank= 60.42
+SIGReg  d= 2 n=5  id_gap=  0.26 [  0.24,   0.27]  eff_rank=  1.90
+SIGReg  d= 8 n=5  id_gap=  0.22 [  0.12,   0.32]  eff_rank= 13.22
+SIGReg  d=32 n=5  id_gap= 15.16 [ 14.89,  15.48]  eff_rank= 26.55
