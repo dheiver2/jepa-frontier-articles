@@ -14,7 +14,7 @@ ORCID: https://orcid.org/0000-0002-8599-9436}}
 \maketitle
 
 \begin{abstract}
-Long documents contain information at several time scales, from sentences to sections. A single-level encoder over the full text is expensive and loses high-level structure. We propose a hierarchical joint-embedding predictive architecture that predicts section embeddings from earlier sections and abstract embeddings from the full body. We evaluate it on a simulated hierarchical process with known latent scales and on scientific articles, where the abstract serves as the target. On a synthetic process, hierarchical pooling beats flat pooling; the JEPA results are pending.
+Long documents contain information at several time scales, from sentences to sections. A single-level encoder over the full text is expensive and loses high-level structure. We propose a hierarchical joint-embedding predictive architecture that predicts section embeddings from earlier sections and abstract embeddings from the full body. We evaluate it on a simulated hierarchical process with known latent scales and on scientific articles, where the abstract serves as the target. In a simulation arm with ten seeds, a hierarchical JEPA recovers the slow state better than a flat JEPA that sees one section ($R^2$ 0.87 to 0.95 against 0.78), but it does not beat a flat encoder over the concatenated sections, nor an untrained mean of the raw sections. The scientific-article arm is pending.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -59,20 +59,43 @@ where $\hat s_n$ is the prediction for held-out item $n$ and $\bar s$ the mean s
 \textbf{Statistics.} Five seeds, 95\% bootstrap intervals.
 
 \section{Results}
-This pilot arm compares hierarchical and flat pooling on a synthetic process with a slow latent state. Hierarchical pooling recovers the slow state with $R^2$ rising from 0.972 ($K=2$ sections) to 0.995 ($K=11$). Flat pooling stays near 0.945 for every $K$. The advantage follows from how the simulator is built, so it is a consistency check only. The JEPA predictors and the scientific-article retrieval arm remain pending.
+We report the simulation arm only, with ten seeds per condition (200 runs). A document has a slow latent state $s\in\mathbb{R}^4$ shared by all sections, and each section is $x_k=\tanh(W_s s+W_u u_k)+0.5\,\varepsilon_k\in\mathbb{R}^{32}$, with a fast latent $u_k\in\mathbb{R}^6$ per section and observation noise $\varepsilon_k$. The abstract is the clean summary $\tanh(W_s s)$. This simulator is nonlinear and noisier than the linear form in Section~III. All learned models share the same MLP encoder, 1{,}500 steps, an EMA target and a variance term against collapse. We compare the hierarchical JEPA (H-JEPA, $\lambda=0.5$), the same model without the section-level loss (noSec), a flat JEPA that sees only the first section (Flat-first, matched to one section of tokens), a flat JEPA over the concatenation of the $K$ sections (Flat-concat), and the untrained mean of the raw sections (Raw-mean). A ridge readout of the frozen document representation recovers $s$ on 1{,}000 held-out documents, and abstract retrieval ranks the true abstract embedding among 500 held-out abstracts (chance recall at 1 is 0.002).
+
+\begin{table}[!t]
+\caption{Slow-state recovery $R^2$ (mean over ten seeds; 95\% bootstrap intervals are at most $\pm0.01$) and abstract recall at 1 (in brackets), by number of sections $K$.}
+\label{tab:hier}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccc}
+\hline
+Method & $K=2$ & $K=4$ & $K=8$ & $K=16$ \\
+\hline
+H-JEPA       & 0.867 [0.30] & 0.913 [0.50] & 0.939 [0.69] & 0.953 [0.84] \\
+noSec        & 0.865 [0.29] & 0.911 [0.49] & 0.937 [0.68] & 0.949 [0.83] \\
+Flat-first   & 0.784 [0.16] & 0.780 [0.16] & 0.784 [0.16] & 0.782 [0.17] \\
+Flat-concat  & 0.863 [0.25] & 0.910 [0.46] & 0.937 [0.66] & 0.952 [0.82] \\
+Raw-mean     & 0.874 [--]   & 0.921 [--]   & 0.949 [--]   & 0.965 [--]   \\
+\hline
+\end{tabular}
+\end{table}
+
+Three results stand out. First, the H-JEPA beats the flat JEPA that sees one section, and the gap grows with $K$: the paired difference in $R^2$ is $+0.083$ [0.079, 0.087] at $K=2$ and $+0.171$ [0.162, 0.180] at $K=16$, and abstract recall at 1 rises from 0.16 to 0.84 against a flat 0.17. This is expected, because Flat-first never sees most of the document. Second, the section-level loss helps by a very small margin: $+0.002$ to $+0.004$ in $R^2$, with intervals that exclude zero but are far below the seed-to-seed differences between methods, so we do not call it an effect that matters. Third, the hierarchical structure does not beat the matched flat baselines. Against Flat-concat the difference is $+0.004$ [0.002, 0.006] at $K=2$ and $+0.001$ [$-0.001$, $+0.003$] at $K=16$, which is a tie. Against the untrained mean of the raw sections, H-JEPA is worse by 0.007 to 0.012 in $R^2$ (the intervals exclude zero). In this simulator the mean of the raw sections already averages out the fast latent and the noise, so a learned encoder with a 16-dimensional bottleneck has nothing to add.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig05_hierarchical.pdf}
-\caption{Slow-state recovery $R^2$ for hierarchical and flat pooling versus number of sections (pilot, synthetic).}
+\caption{Slow-state recovery $R^2$ versus number of sections for five document representations (mean, 95\% bootstrap CI over ten seeds). Simulation arm only.}
 \label{fig:fig05_hierarchical}
 \end{figure}
 
+The scientific-article retrieval arm (open-access papers, abstract as target) and the abstract-level classification remain pending: they need a corpus that has not been downloaded.
+
 \section{Discussion and Limitations}
-Abstracts are written by the authors and may not capture all content, so retrieval scores are a proxy. Results are reported by discipline to avoid averaging away differences.
+The simulation shows that predicting from several sections beats predicting from one, which is an architectural consistency check. It does not show an advantage of the hierarchical JEPA over a flat encoder with access to the same content, and it does not show that a learned representation beats simple averaging. The effective rank of the learned representations is 2 to 3.3 out of 16 dimensions, so collapse is only partly avoided and may limit the learned models. Flat-first sees fewer tokens than the other learned models by construction, and the weight $\lambda=0.5$ was fixed, not tuned on a validation split as the method describes. Abstracts written by authors may not capture all content, so retrieval scores on real papers will be a proxy, and they will be reported by discipline to avoid averaging away differences.
 
 \section{Conclusion}
-We propose a two-level JEPA for documents and a protocol that evaluates it on a simulated process with known scales and on scientific articles.
+We propose a two-level JEPA for documents. On a simulated process with known scales it recovers the slow state far better than a flat encoder that sees one section, and it ties a flat encoder over the same sections. Whether it helps on real scientific articles is not yet tested.
 
 \section*{Acknowledgments}
 The author thanks the Brazilian artificial intelligence community.

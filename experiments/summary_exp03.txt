@@ -1,0 +1,43 @@
+Experiment 3 (simulation arm), 240 rows. Mean [95% bootstrap CI over SCM seeds]. Errors are normalised by the target variance.
+
+-- linear, n=5
+  Reg    k=10 int_err=0.418 [0.171,0.774] int_err_conf=0.839 [0.353,1.567] obs_mse=0.065 [0.040,0.099] shd_in=1.100 [0.600,1.600] lat_err=nan [nan,nan]
+  VAE    k=10 int_err=0.407 [0.180,0.748] int_err_conf=0.765 [0.314,1.458] obs_mse=0.068 [0.044,0.099] shd_in=1.300 [0.800,1.800] lat_err=nan [nan,nan]
+  JEPA   k=10 int_err=0.412 [0.173,0.775] int_err_conf=0.834 [0.360,1.556] obs_mse=0.070 [0.043,0.106] shd_in=1.100 [0.600,1.700] lat_err=0.336 [0.146,0.617]
+  Oracle k=10 int_err=0.000 [0.000,0.000] int_err_conf=0.000 [0.000,0.000] obs_mse=0.385 [0.234,0.575] shd_in=0.000 [0.000,0.000] lat_err=nan [nan,nan]
+-- linear, n=10
+  Reg    k=10 int_err=0.509 [0.240,0.815] int_err_conf=1.233 [0.655,1.826] obs_mse=0.125 [0.071,0.195] shd_in=3.200 [2.500,4.000] lat_err=nan [nan,nan]
+  VAE    k=10 int_err=0.531 [0.229,0.835] int_err_conf=1.130 [0.601,1.700] obs_mse=0.135 [0.078,0.205] shd_in=3.800 [3.000,4.500] lat_err=nan [nan,nan]
+  JEPA   k=10 int_err=0.516 [0.234,0.839] int_err_conf=1.239 [0.652,1.856] obs_mse=0.129 [0.074,0.202] shd_in=3.200 [2.600,3.900] lat_err=0.443 [0.210,0.706]
+  Oracle k=10 int_err=0.000 [0.000,0.001] int_err_conf=0.000 [0.000,0.001] obs_mse=0.739 [0.425,1.158] shd_in=0.000 [0.000,0.000] lat_err=nan [nan,nan]
+-- linear, n=20
+  Reg    k=10 int_err=0.788 [0.296,1.392] int_err_conf=1.839 [0.964,2.835] obs_mse=0.213 [0.104,0.352] shd_in=3.900 [3.200,4.600] lat_err=nan [nan,nan]
+  VAE    k=10 int_err=0.758 [0.287,1.357] int_err_conf=1.633 [0.807,2.558] obs_mse=0.243 [0.131,0.384] shd_in=5.300 [4.400,6.200] lat_err=nan [nan,nan]
+  JEPA   k=10 int_err=0.766 [0.294,1.337] int_err_conf=1.824 [0.921,2.923] obs_mse=0.242 [0.110,0.425] shd_in=4.100 [3.400,4.800] lat_err=0.587 [0.245,1.015]
+  Oracle k=10 int_err=0.001 [0.000,0.001] int_err_conf=0.001 [0.000,0.001] obs_mse=1.266 [0.603,2.086] shd_in=0.000 [0.000,0.000] lat_err=nan [nan,nan]
+-- nonlinear, n=5
+  Reg    k=10 int_err=0.192 [0.135,0.262] int_err_conf=0.427 [0.291,0.589] obs_mse=0.248 [0.193,0.312] shd_in=1.500 [1.000,2.100] lat_err=nan [nan,nan]
+  VAE    k=10 int_err=0.168 [0.109,0.245] int_err_conf=0.374 [0.226,0.548] obs_mse=0.250 [0.194,0.315] shd_in=1.300 [0.800,1.800] lat_err=nan [nan,nan]
+  JEPA   k=10 int_err=0.263 [0.193,0.341] int_err_conf=0.557 [0.405,0.720] obs_mse=0.277 [0.210,0.353] shd_in=1.400 [0.900,1.900] lat_err=0.193 [0.130,0.270]
+  Oracle k=10 int_err=0.016 [0.013,0.019] int_err_conf=0.024 [0.015,0.033] obs_mse=0.710 [0.457,1.000] shd_in=0.000 [0.000,0.000] lat_err=nan [nan,nan]
+-- nonlinear, n=10
+  Reg    k=10 int_err=0.271 [0.155,0.424] int_err_conf=0.724 [0.434,1.034] obs_mse=0.374 [0.261,0.507] shd_in=2.700 [2.198,3.400] lat_err=nan [nan,nan]
+  VAE    k=10 int_err=0.258 [0.142,0.402] int_err_conf=0.695 [0.413,0.985] obs_mse=0.377 [0.261,0.512] shd_in=2.700 [1.900,3.600] lat_err=nan [nan,nan]
+  JEPA   k=10 int_err=0.482 [0.271,0.768] int_err_conf=1.186 [0.743,1.721] obs_mse=0.474 [0.307,0.662] shd_in=3.000 [2.200,3.900] lat_err=0.390 [0.200,0.658]
+  Oracle k=10 int_err=0.017 [0.011,0.023] int_err_conf=0.025 [0.013,0.039] obs_mse=1.105 [0.696,1.558] shd_in=0.000 [0.000,0.000] lat_err=nan [nan,nan]
+-- nonlinear, n=20
+  Reg    k=10 int_err=0.186 [0.119,0.263] int_err_conf=0.602 [0.448,0.783] obs_mse=0.300 [0.227,0.390] shd_in=3.200 [2.400,4.100] lat_err=nan [nan,nan]
+  VAE    k=10 int_err=0.171 [0.102,0.254] int_err_conf=0.515 [0.378,0.681] obs_mse=0.333 [0.251,0.430] shd_in=4.100 [2.800,5.300] lat_err=nan [nan,nan]
+  JEPA   k=10 int_err=0.262 [0.156,0.388] int_err_conf=0.812 [0.583,1.068] obs_mse=0.343 [0.246,0.460] shd_in=3.500 [2.500,4.500] lat_err=0.222 [0.133,0.329]
+  Oracle k=10 int_err=0.016 [0.013,0.020] int_err_conf=0.018 [0.010,0.028] obs_mse=0.875 [0.587,1.209] shd_in=0.000 [0.000,0.000] lat_err=nan [nan,nan]
+
+-- pooled over all SCMs (per method)
+  Reg    k=60 int_err=0.394 [0.273,0.536] int_err_conf=0.944 [0.704,1.225] int_err_unconf=0.024 [0.012,0.043] obs_mse=0.221 [0.178,0.267] shd_in=2.600 [2.233,2.983] lat_err=nan [nan,nan]
+  VAE    k=60 int_err=0.382 [0.266,0.519] int_err_conf=0.852 [0.637,1.098] int_err_unconf=0.064 [0.031,0.110] obs_mse=0.234 [0.192,0.282] shd_in=3.083 [2.583,3.584] lat_err=nan [nan,nan]
+  JEPA   k=60 int_err=0.450 [0.328,0.595] int_err_conf=1.075 [0.827,1.355] int_err_unconf=0.034 [0.023,0.046] obs_mse=0.256 [0.201,0.314] shd_in=2.717 [2.333,3.117] lat_err=0.362 [0.267,0.471]
+  Oracle k=60 int_err=0.008 [0.006,0.011] int_err_conf=0.011 [0.007,0.016] int_err_unconf=0.006 [0.004,0.009] obs_mse=0.847 [0.670,1.046] shd_in=0.000 [0.000,0.000] lat_err=nan [nan,nan]
+
+-- paired differences in int_err over the same SCMs
+  JEPA - Reg: 0.0562 [0.0273, 0.0917] (k=60)
+  JEPA - VAE: 0.0680 [0.0332, 0.1085] (k=60)
+  Reg - VAE: 0.0118 [-0.0096, 0.0327] (k=60)

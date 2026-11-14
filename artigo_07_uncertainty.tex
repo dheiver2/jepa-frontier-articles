@@ -14,7 +14,7 @@ ORCID: https://orcid.org/0000-0002-8599-9436}}
 \maketitle
 
 \begin{abstract}
-A deterministic predictor in embedding space collapses multiple valid futures into their average, which can be a state that never occurs. We study whether a JEPA predictor can represent several futures, and whether its uncertainty is calibrated. We use simulated systems with known branching, and a language setting in which a prompt admits several correct continuations. A bimodal pilot shows the mixture interval attains its nominal coverage; the JEPA results are pending.
+A deterministic predictor in embedding space collapses multiple valid futures into their average, which can be a state that never occurs. We study whether a JEPA predictor can represent several futures, and whether its uncertainty is calibrated. We use simulated systems with known branching, and a language setting in which a prompt admits several correct continuations. In simulation arms with known branching and ten seeds, a mixture head on raw states comes within 0.04 nats of the exact predictive entropy and covers about 0.89 of the futures at a 90\% target, while a deterministic predictor, a single Gaussian and a spread-only ensemble lose 1.4 to 730 nats; on frozen JEPA latents, where no oracle exists, the mixture again has the lowest NLL and calibration error. The language arm is pending.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -67,20 +67,51 @@ where $S_b$ is the set of predictions whose confidence falls in bin $b$, $\mathr
 \textbf{Statistics.} Five seeds, 95\% bootstrap intervals.
 
 \section{Results}
-This pilot arm compares interval coverage on a bimodal future with a known structure. The two-mode interval attains 0.90 to 0.91 coverage at every noise level, matching its nominal 90\%. The unimodal Gaussian interval over-covers at low noise (1.00) and falls to 0.95 at high noise. The JEPA predictor, the calibration error, and the language prompts remain pending.
+We report the simulation arms only, with ten seeds per condition. State $s\in\mathbb{R}^2$ moves as $s'=As+b_k+0.15\,\varepsilon$, where $A$ is a contraction-rotation and the branch $k$ is drawn with a state-dependent probability. The ``ball'' system has two branches and $\pi_1(s)=\sigma(3s_x)$, and the ``multi'' system has three branches with softmax weights. The true conditional is a Gaussian mixture, so its exact negative log-likelihood (oracle) is $-0.596$ nats for ball and $-0.315$ for multi. In the \emph{state} arm the predictors see $s$ directly. In the \emph{latent} arm a JEPA (MLP encoder to 4 dimensions, predictor, EMA target, variance and covariance terms) is trained on observations $o=\tanh(M_2\tanh(M_1 s))\in\mathbb{R}^{12}$, then frozen, and the heads are trained on its standardized latents, where no oracle exists. The four heads share a trunk, 20{,}000 training transitions and 1{,}500 steps: a deterministic MLP (Gaussian with the residual covariance), five deterministic MLPs (Gaussian from the members' spread only), a single heteroscedastic Gaussian, and a three-component mixture. Metrics use 2{,}000 held-out transitions: NLL, coverage of the 90\% highest-density region (derived from 400 predictive samples for the mixture), and the top-label ECE (10 bins) of branch probabilities obtained by classifying 100 predictive samples with a classifier trained on the true branch.
+
+\begin{table}[!t]
+\caption{Negative log-likelihood (state arm: gap to the oracle, in nats; latent arm: raw NLL, not comparable across arms), 90\% coverage and ECE, mean over ten seeds. B: ball, M: multi.}
+\label{tab:uncert}
+\centering
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{2}{c}{NLL} & \multicolumn{2}{c}{Cov.\ 90\%} & \multicolumn{2}{c}{ECE} \\
+Head & B & M & B & M & B & M \\
+\hline
+\multicolumn{7}{l}{\emph{State arm (gap to oracle)}} \\
+Determ.  & +1.59 & +3.10 & 0.87 & 0.84 & 0.023 & 0.047 \\
+Ensemble & +377  & +732  & 0.05 & 0.06 & 0.158 & 0.266 \\
+Gaussian & +1.36 & +2.77 & 0.91 & 0.90 & 0.032 & 0.050 \\
+Mixture  & +0.04 & +0.04 & 0.89 & 0.89 & 0.019 & 0.019 \\
+\hline
+\multicolumn{7}{l}{\emph{Latent arm (JEPA latents)}} \\
+Determ.  & 2.57  & 4.42  & 0.86 & 0.84 & 0.050 & 0.062 \\
+Ensemble & 842   & 2047  & 0.03 & 0.02 & 0.165 & 0.277 \\
+Gaussian & 1.71  & 3.55  & 0.90 & 0.88 & 0.039 & 0.037 \\
+Mixture  & $-$3.04 & $-$2.77 & 0.88 & 0.88 & 0.016 & 0.020 \\
+\hline
+\end{tabular}
+\end{table}
+
+The mixture head is the only one close to the truth. In the state arm its gap to the oracle is $+0.035$ [0.027, 0.042] nats for ball and $+0.042$ [0.034, 0.050] for multi, against $+1.36$ and $+2.77$ for the single Gaussian and $+1.59$ and $+3.10$ for the deterministic predictor. Its ECE is 0.019 in both systems, lower than every other head. In the latent arm the ordering is the same: the mixture has the lowest NLL ($-3.04$ and $-2.77$) and the lowest ECE (0.016 and 0.020). The raw NLL values of the two arms are not comparable, because the latents are standardized and live in a different space.
+
+Coverage alone does not separate the heads, and this matters for how the metric is used. The deterministic predictor and the single Gaussian reach 0.84 to 0.91 coverage because their highest-density region is a broad ellipse that contains both branches and the empty space between them, which is exactly the averaging failure the paper targets. The deterministic predictor is slightly under-covered (0.84 to 0.87), the single Gaussian is near nominal (0.88 to 0.91), and the mixture is slightly below 0.90 (0.88 to 0.89, with an interval of [0.886, 0.903] for ball and [0.882, 0.898] for multi in the state arm). NLL and the branch ECE expose the difference. The ensemble that uses only its members' spread collapses to coverage 0.02 to 0.06: the members agree with one another and ignore the aleatoric branching, so a deterministic ensemble is not a substitute for a multimodal head. We did not test an ensemble with an added residual term, which would likely repair the coverage but not the shape of the region.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig07_uncertainty.pdf}
-\caption{90\% interval coverage for unimodal and mixture predictors versus noise level (pilot). Dashed line: nominal 0.90.}
+\caption{Coverage of the 90\% highest-density region by head, system and arm (mean, 95\% bootstrap CI over ten seeds). Dashed line: nominal 0.90. Simulation arms.}
 \label{fig:fig07_uncertainty}
 \end{figure}
 
+The language arm (prompts with several correct continuations and human-labeled acceptability) remains pending.
+
 \section{Discussion and Limitations}
-Closed-form futures exist only for simple simulators, so the language evaluation depends on labels that may disagree. Calibration results are reported with the number of bins and the binning scheme.
+The simulations isolate one question: can a predictor in a JEPA latent represent several futures, and is its uncertainty calibrated. The answer here is yes for a three-component mixture on frozen latents, in two low-dimensional systems with well separated branches. The mixture has three components in both systems, although ball has two branches, and it was still calibrated. The JEPA encoder was trained with a deterministic predictor and frozen before the heads, so the latent was not shaped by the multimodal objective, and joint training may behave differently. The state arm has closed-form futures only for simple simulators, and no exact oracle is available in the latent space. Branch probabilities depend on a classifier trained on the true branch, and ECE is computed on 2{,}000 transitions with 10 bins. The language evaluation will depend on labels that may disagree, and the binning scheme will be reported with its results.
 
 \section{Conclusion}
-We propose a multimodal JEPA predictor and a protocol that tests coverage and calibration against known futures and against ambiguous natural-language prompts.
+We propose a multimodal JEPA predictor. On simulated branching systems a mixture head on raw states stays within 0.04 nats of the exact predictive entropy where deterministic, single-Gaussian and spread-only ensemble heads do not, it is also best on frozen JEPA latents, and NLL and branch ECE separate the heads where 90\% coverage does not. The test on ambiguous natural-language prompts is still pending.
 
 \section*{Acknowledgments}
 The author thanks the Brazilian artificial intelligence community.

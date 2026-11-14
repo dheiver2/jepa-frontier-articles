@@ -1,0 +1,32 @@
+Experiment 4 (synthetic arithmetic arm), 60 runs. Exact-match accuracy, mean [95% bootstrap CI over seeds]. Chance 0.10.
+
+-- depth k=1
+  AR          n=5 params=71370 acc_canon=1.000 [1.000,1.000] acc_para=1.000 [1.000,1.000]
+  JEPA        n=5 params=80162 acc_canon=1.000 [1.000,1.000] acc_para=1.000 [1.000,1.000] acc_canon_nearest=1.000 [1.000,1.000] acc_para_nearest=1.000 [1.000,1.000]
+  JEPA-nopara n=5 params=80162 acc_canon=1.000 [1.000,1.000] acc_para=1.000 [1.000,1.000] acc_canon_nearest=1.000 [1.000,1.000] acc_para_nearest=1.000 [1.000,1.000]
+-- depth k=2
+  AR          n=5 params=71370 acc_canon=0.800 [0.794,0.806] acc_para=0.801 [0.793,0.807]
+  JEPA        n=5 params=80162 acc_canon=0.766 [0.742,0.788] acc_para=0.768 [0.743,0.791] acc_canon_nearest=0.775 [0.750,0.795] acc_para_nearest=0.770 [0.739,0.796]
+  JEPA-nopara n=5 params=80162 acc_canon=0.798 [0.777,0.813] acc_para=0.795 [0.774,0.812] acc_canon_nearest=0.793 [0.774,0.808] acc_para_nearest=0.794 [0.771,0.811]
+-- depth k=3
+  AR          n=5 params=71370 acc_canon=0.149 [0.095,0.224] acc_para=0.138 [0.094,0.188]
+  JEPA        n=5 params=80162 acc_canon=0.218 [0.137,0.297] acc_para=0.220 [0.141,0.298] acc_canon_nearest=0.222 [0.150,0.295] acc_para_nearest=0.223 [0.152,0.294]
+  JEPA-nopara n=5 params=80162 acc_canon=0.276 [0.229,0.318] acc_para=0.276 [0.231,0.319] acc_canon_nearest=0.271 [0.241,0.295] acc_para_nearest=0.269 [0.239,0.290]
+-- depth k=4
+  AR          n=5 params=71370 acc_canon=0.095 [0.091,0.098] acc_para=0.095 [0.092,0.099]
+  JEPA        n=5 params=80162 acc_canon=0.125 [0.100,0.164] acc_para=0.125 [0.100,0.164] acc_canon_nearest=0.122 [0.095,0.165] acc_para_nearest=0.121 [0.094,0.164]
+  JEPA-nopara n=5 params=80162 acc_canon=0.140 [0.105,0.174] acc_para=0.134 [0.098,0.170] acc_canon_nearest=0.132 [0.099,0.170] acc_para_nearest=0.135 [0.106,0.171]
+
+-- paired differences in acc_para (same seed and depth)
+  k=1 JEPA - AR: +0.000 [+0.000, +0.000] (n=5)
+  k=2 JEPA - AR: -0.033 [-0.052, -0.015] (n=5)
+  k=3 JEPA - AR: +0.081 [-0.001, +0.170] (n=5)
+  k=4 JEPA - AR: +0.030 [+0.006, +0.066] (n=5)
+  k=1 JEPA - JEPA-nopara: +0.000 [+0.000, +0.000] (n=5)
+  k=2 JEPA - JEPA-nopara: -0.027 [-0.049, -0.010] (n=5)
+  k=3 JEPA - JEPA-nopara: -0.057 [-0.137, +0.023] (n=5)
+  k=4 JEPA - JEPA-nopara: -0.009 [-0.037, +0.010] (n=5)
+  k=1 JEPA-nopara - AR: +0.000 [+0.000, +0.000] (n=5)
+  k=2 JEPA-nopara - AR: -0.006 [-0.024, +0.006] (n=5)
+  k=3 JEPA-nopara - AR: +0.138 [+0.044, +0.223] (n=5)
+  k=4 JEPA-nopara - AR: +0.038 [+0.003, +0.074] (n=5)

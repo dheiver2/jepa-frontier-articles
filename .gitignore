@@ -6,3 +6,6 @@
 __pycache__/
 experiments/refs_backup_before_ieee.bib
 .DS_Store
+experiments/log_exp*.txt
+experiments/part_exp*
+__pycache__/

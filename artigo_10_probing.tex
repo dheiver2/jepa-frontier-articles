@@ -14,7 +14,7 @@ ORCID: https://orcid.org/0000-0002-8599-9436}}
 \maketitle
 
 \begin{abstract}
-Probes are used to claim that a representation encodes a property, but a probe that succeeds may reflect its own capacity rather than the representation. We study probing of JEPA latent spaces with two controls: simulated systems with known state, where a probe's fidelity can be measured exactly, and linguistic properties (negation, tense, and syntactic depth) with matched control tasks. A pilot with a random encoder shows selectivity that grows with width; the JEPA probing results are pending.
+Probes are used to claim that a representation encodes a property, but a probe that succeeds may reflect its own capacity rather than the representation. We study probing of JEPA latent spaces with two controls: simulated systems with known state, where a probe's fidelity can be measured exactly, and linguistic properties (negation, tense, and syntactic depth) with matched control tasks. In a simulated system with known state, a JEPA encoder recovers the state better than an untrained encoder of the same architecture at every width, by up to 0.26 in $R^2$ at width 8, but the difference vanishes at width 64 and selectivity is statistically the same for both encoders. The linguistic probes remain pending.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -33,11 +33,7 @@ JEPA latents are used for prediction and planning \cite{bardes2024vjepa}, and th
 Given a frozen encoder $f_\theta$ and a property $y$, a probe $p_w$ is trained on representations. Selectivity is the difference between the probe accuracy on the true labels and on a control task with random labels mapped to the same label set. Fidelity in simulation is the $R^2$ of recovering the true state from the latent, and sufficiency is the accuracy of a downstream task using only the latent.
 
 \subsection*{Equations and their meaning}
-The frozen encoder maps the latent state $z\in\mathbb{R}^{8}$ to a representation $h=\tanh(zR)$, where $R\in\mathbb{R}^{8\times m}$ is a fixed random projection and $m$ is the representation width. The linear probe is
-\begin{equation}
-p(y\mid h)=\sigma(w^\top h+b),
-\end{equation}
-trained on the property $y=\mathbf{1}[z_1>0]$ and on a control task with random labels $c\sim\mathrm{Bernoulli}(0.5)$.
+The simulated system has a known state $s\in\mathbb{R}^{8}$ made of four two-dimensional rotating blocks with different frequencies, a mild nonlinear coupling, and process noise. It is rendered into a 128-dimensional observation $o=\tanh(sB)M+\eta$. A JEPA encoder $f_\theta$ with representation width $m$ is trained to predict the embedding of the next observation from the current one, $\mathcal{L}=\lVert g_\phi(f_\theta(o_t))-\bar f(o_{t+1})\rVert_2^2$, with an EMA target $\bar f$ and a variance term against collapse. The reference is an untrained encoder of the same architecture and width. The probe is either linear, $p(y\mid h)=\sigma(w^\top h+b)$, or a one-hidden-layer MLP with 64 units, trained on the property $y=\mathbf{1}[s_1>0]$ and on a control task. The control task assigns a random label to each cell of an $8\times 8$ grid over $(s_1,s_2)$, so a probe can only fit it by memorizing the geometry of the representation.
 
 Selectivity is the gap between the probe's accuracy on the true property and on the control:
 \begin{equation}
@@ -57,20 +53,43 @@ Fidelity for simulated state is the $R^2$ of a linear probe recovering the true 
 \textbf{Statistics.} Five seeds of the encoder, 95\% bootstrap intervals over probe training runs, and selectivity reported with its interval.
 
 \section{Results}
-This pilot arm probes a frozen random tanh encoder of width $m$ for a property encoded in the latent state. Selectivity (true-label accuracy minus random-label accuracy) rises from 0.15 at $m=2$ to 0.46 at $m=64$, while the control accuracy stays at 0.50. The rise reflects the probe's capacity to read more features, so it does not isolate what the encoder encodes. The JEPA latents, the simulated-state fidelity metric, and the linguistic probes remain pending.
+We report the simulated-state arm only (script \texttt{exp10\_probing\_sim.py}): six widths $m\in\{2,4,8,16,32,64\}$, two encoders (trained JEPA and untrained), two probe types, and 10 seeds, with 3{,}000 probe training and 3{,}000 test observations. Fidelity is the $R^2$ of a ridge probe that recovers the true state, and sufficiency is the accuracy of a linear probe that predicts the sign of $s_1$ five steps ahead. Intervals are 95\% bootstrap over seeds.
+
+\begin{table*}[!t]
+\caption{Fidelity $R^2$ and selectivity (linear probe) by width, mean over 10 seeds [95\% bootstrap CI].}
+\label{tab:probing}
+\centering
+\small
+\small
+\begin{tabular}{rcccc}
+\hline
+ & \multicolumn{2}{c}{Fidelity $R^2$} & \multicolumn{2}{c}{Selectivity} \\
+$m$ & JEPA & Untrained & JEPA & Untrained \\
+\hline
+2  & 0.234 [0.231, 0.237] & 0.197 [0.186, 0.206] & $-0.02$ [$-0.08$, $+0.05$] & $-0.03$ [$-0.09$, $+0.04$] \\
+8  & 0.861 [0.845, 0.875] & 0.598 [0.578, 0.619] & $+0.24$ [$+0.21$, $+0.28$] & $+0.16$ [$+0.09$, $+0.23$] \\
+16 & 0.939 [0.934, 0.942] & 0.823 [0.811, 0.835] & $+0.27$ [$+0.24$, $+0.30$] & $+0.22$ [$+0.19$, $+0.25$] \\
+64 & 0.966 [0.964, 0.967] & 0.958 [0.957, 0.959] & $+0.27$ [$+0.24$, $+0.30$] & $+0.27$ [$+0.24$, $+0.30$] \\
+\hline
+\end{tabular}
+\end{table*}
+
+Training helps fidelity most at intermediate widths. The paired difference JEPA minus untrained in $R^2$ is $+0.037$ at $m=2$, $+0.109$ at $m=4$, $+0.262$ [$+0.234$, $+0.289$] at $m=8$, $+0.116$ at $m=16$, $+0.040$ at $m=32$, and $+0.008$ [$+0.007$, $+0.009$] at $m=64$, all with intervals above zero. At large width the random projection already keeps nearly all the state (R$^2$ 0.958 at $m=64$), so a trained encoder adds little. Sufficiency follows the same pattern: at $m=8$ it is 0.890 for JEPA and 0.813 for the untrained encoder, and 0.947 against 0.938 at $m=64$.
+
+Selectivity behaves differently. For both encoders it is near zero at $m=2$ and rises to about $+0.27$ at $m=32$ and $m=64$ with the linear probe, which confirms that most of the growth with width comes from the probe having more features, not from what the encoder learned. At $m=8$ and $m=16$ the JEPA selectivity is higher than the untrained one ($+0.24$ against $+0.16$ at $m=8$), but the intervals overlap at every width, so the data do not show that training changes selectivity. The MLP probe gives the same picture (selectivity $+0.244$ for JEPA and $+0.245$ for the untrained encoder at $m=64$). The control accuracy is about 0.65 to 0.72 and not 0.5, because the random control table has more cells of one label than of the other, so a majority-label probe already scores above chance.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig10_probing.pdf}
-\caption{True-label and control-task probe accuracy versus probe input width (pilot, frozen random encoder).}
+\caption{Fidelity $R^2$ (linear probe, left) and selectivity (MLP probe, right) versus representation width for the trained JEPA and the untrained encoder (mean, 95\% bootstrap CI over 10 seeds).}
 \label{fig:fig10_probing}
 \end{figure}
 
 \section{Discussion and Limitations}
-Selectivity depends on the probe family and on the control construction, so both are fixed in advance and reported. Synthetic grammars are narrower than natural language, which limits the claims about natural text.
+Selectivity depends on the probe family and on the control construction, so both are fixed in advance and reported. Synthetic grammars are narrower than natural language, which limits the claims about natural text. The simulated arm uses a single system (rotating blocks with weak coupling), MLP encoders, and a control task whose accuracy is above 0.5 because of label imbalance, so selectivity values are only comparable within this setup. The result that training changes fidelity but not selectivity is specific to this system and to the widths tested.
 
 \section{Conclusion}
-We propose a probing protocol for JEPA latents with simulated ground truth, linguistic control tasks, and selectivity reported with confidence intervals.
+We propose a probing protocol for JEPA latents with simulated ground truth, linguistic control tasks, and selectivity reported with confidence intervals. In a simulated system with known state, a trained JEPA encoder recovers the state better than an untrained one at small and intermediate widths, the difference disappears at large width, and selectivity does not separate the two. The linguistic probes remain pending.
 
 \section*{Acknowledgments}
 The author thanks the Brazilian artificial intelligence community.

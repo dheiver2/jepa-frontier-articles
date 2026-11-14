@@ -1,0 +1,8 @@
+Experiment 2 (simulation arm), 40 rows, 10 seeds. Mean [95% bootstrap CI over seeds].
+
+JEPA   n=10  success=0.585 [0.462, 0.715]  final_err=0.161 [0.122, 0.202]  r2_theta=0.913 [0.899, 0.924]  r2_omega=0.921 [0.916, 0.927]  eff_rank=15.761 [15.745, 15.777]
+Recon  n=10  success=0.145 [0.090, 0.197]  final_err=0.511 [0.429, 0.588]  r2_theta=0.876 [0.835, 0.911]  r2_omega=0.897 [0.879, 0.915]  eff_rank=6.064 [5.278, 7.113]
+Known  n=10  success=0.960 [0.945, 0.975]  final_err=0.028 [0.023, 0.033]  r2_theta=nan [nan, nan]  r2_omega=nan [nan, nan]  eff_rank=nan [nan, nan]
+Random n=10  success=0.083 [0.058, 0.110]  final_err=0.645 [0.613, 0.679]  r2_theta=nan [nan, nan]  r2_omega=nan [nan, nan]  eff_rank=nan [nan, nan]
+
+Paired JEPA - Recon success: 0.440 [0.292, 0.595] (n=10 seeds)

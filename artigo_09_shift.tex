@@ -14,7 +14,7 @@ ORCID: https://orcid.org/0000-0002-8599-9436}}
 \maketitle
 
 \begin{abstract}
-Representations learned with joint-embedding predictive architectures (JEPA) degrade under distribution shift, and continual adaptation can cause forgetting. We measure degradation and adaptation cost under controlled shifts: parametric image corruptions with known severity, and a language shift from English to Brazilian Portuguese. We compare full fine-tuning, parameter-efficient adapters, and replay. A synthetic pilot shows no degradation under the tested shift, so the adaptation results are pending.
+Representations learned with joint-embedding predictive architectures (JEPA) degrade under distribution shift, and continual adaptation can cause forgetting. We measure degradation and adaptation cost under controlled shifts: parametric image corruptions with known severity, and a language shift from English to Brazilian Portuguese. We compare full fine-tuning, parameter-efficient adapters, and replay. In a synthetic arm with known severity, accuracy falls from 0.96 to 0.72 as the shift grows, adaptation on 200 labeled shifted samples lifts the highest severity to 0.88--0.89, and replay keeps forgetting at 0.02 against 0.08 for full fine-tuning and 0.11 for low-rank adapters. The image and Portuguese language arms remain pending.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -33,11 +33,11 @@ JEPA representations are evaluated mainly on in-distribution benchmarks \cite{ba
 Let $f_{\theta_0}$ be a pretrained JEPA encoder. Three adaptation methods are compared on a shifted task: full fine-tuning; low-rank adapters with rank $r$; and fine-tuning with a replay buffer of source samples. Forgetting is measured as the drop in source-task accuracy after adaptation.
 
 \subsection*{Equations and their meaning}
-The pilot shifts the input with severity $s\in\{1,\dots,10\}$:
+The synthetic arm shifts the input with severity $s\in\{1,\dots,5\}$:
 \begin{equation}
-X'=X+0.1\,s\,\varepsilon+0.3\,s\,\Pi X,
+X'=(1-0.04\,s)\big[(1-a)X+a\,QX\big]+0.05\,s\,\varepsilon,\qquad a=0.15\,s,
 \end{equation}
-where $\varepsilon$ is Gaussian noise, $\Pi X$ is the feature vector rolled by one position, and the two terms add noise and feature mixing that grow with $s$. The label rule $y=\mathbf{1}[w^\top x>0]$ is unchanged.
+where $Q$ is a fixed random orthogonal matrix that mixes features, $\varepsilon$ is Gaussian noise, and the three terms (mixing, gain, noise) all grow with $s$. The source data are $x=\tanh(uB)M$ with an eight-dimensional latent $u$, and the label rule $y=\mathbf{1}[w^\top u+0.5\,u_1u_2>0]$ is unchanged by the shift.
 
 Accuracy on the shifted target is
 \begin{equation}
@@ -47,9 +47,9 @@ and forgetting is the drop on the source domain after adaptation,
 \begin{equation}
 F=\mathrm{Acc}_{\mathrm{src}}^{\mathrm{before}}-\mathrm{Acc}_{\mathrm{src}}^{\mathrm{after}}.
 \end{equation}
-Replay adaptation fits a logistic classifier on the union of source samples and $200$ shifted samples. For a linear classifier $P(y=1\mid x)=\sigma(w^\top x+b)$ fitted by maximum likelihood, the training objective is
+A JEPA encoder (two noisy views, EMA target, variance term) is pretrained on unlabeled source data, and a linear head is fitted on source labels with the encoder frozen. All adaptation methods then use the same budget: 200 labeled shifted samples and 300 Adam steps. \emph{Full fine-tuning} updates the encoder and the head. \emph{Adapters} freeze the encoder weights and train rank-4 low-rank residual adapters on both encoder layers plus the head. \emph{Replay} is full fine-tuning in which half of each batch comes from 200 stored source samples. A single model is evaluated on both domains, with no domain switch. The head is trained with the logistic loss
 \begin{equation}
-\mathcal{L}=-\sum_{n}\big[y_n\log\sigma(w^\top x_n+b)+(1-y_n)\log(1-\sigma(w^\top x_n+b))\big].
+\mathcal{L}=-\sum_{n}\big[y_n\log\sigma(w^\top z_n+b)+(1-y_n)\log(1-\sigma(w^\top z_n+b))\big].
 \end{equation}
 
 \section{Experimental Protocol}
@@ -62,20 +62,47 @@ Replay adaptation fits a logistic classifier on the union of source samples and 
 \textbf{Statistics.} Five seeds, 95\% bootstrap intervals, paired tests across methods.
 
 \section{Results}
-This pilot arm applies a linear classifier to synthetic features with a perturbation of severity 1 to 10. Accuracy stays at about 0.99 for every severity, with and without replay adaptation. The shift is too weak to degrade the classifier, so the arm cannot measure forgetting or adaptation cost. The image corruptions, the Portuguese--English shift, and the JEPA encoder remain pending.
+We report the synthetic arm only (script \texttt{exp09\_shift\_sim.py}): five severities, four methods, and 10 seeds, 200 runs in total. Source accuracy before adaptation is 0.959. Table~\ref{tab:shift} gives target accuracy and forgetting with 95\% bootstrap intervals over seeds.
+
+\begin{table}[!t]
+\caption{Target accuracy (left) and forgetting $F$ (right) by severity $s$, mean over 10 seeds [95\% bootstrap CI]. NoAdapt is the deployed model without adaptation.}
+\label{tab:shift}
+\centering
+\small
+\begin{tabular}{llcc}
+\hline
+Method & $s$ & Target acc. & Forgetting $F$ \\
+\hline
+NoAdapt & 1 & 0.955 [0.951, 0.958] & 0 \\
+NoAdapt & 3 & 0.903 [0.894, 0.911] & 0 \\
+NoAdapt & 5 & 0.724 [0.693, 0.753] & 0 \\
+FullFT  & 1 & 0.924 [0.917, 0.932] & 0.035 [0.029, 0.040] \\
+FullFT  & 3 & 0.921 [0.914, 0.930] & 0.046 [0.037, 0.055] \\
+FullFT  & 5 & 0.891 [0.879, 0.901] & 0.204 [0.166, 0.246] \\
+Adapter & 1 & 0.922 [0.913, 0.931] & 0.038 [0.032, 0.044] \\
+Adapter & 3 & 0.921 [0.912, 0.931] & 0.054 [0.040, 0.070] \\
+Adapter & 5 & 0.886 [0.877, 0.895] & 0.279 [0.217, 0.337] \\
+Replay  & 1 & 0.945 [0.940, 0.950] & 0.012 [0.008, 0.015] \\
+Replay  & 3 & 0.927 [0.921, 0.934] & 0.018 [0.013, 0.023] \\
+Replay  & 5 & 0.883 [0.872, 0.893] & 0.032 [0.026, 0.039] \\
+\hline
+\end{tabular}
+\end{table}
+
+Unlike the earlier linear pilot, this shift degrades the model: without adaptation, target accuracy falls from 0.955 at $s=1$ to 0.724 at $s=5$. Adaptation helps only at the higher severities. At $s=1$ and $s=2$ the unadapted model is as good as or better than every adapted one, which we did not investigate further; a plausible reason is that 200 samples add noise to a model that is still accurate. At $s=5$, all three adaptation methods reach 0.88 to 0.89, against 0.72 without adaptation. Averaged over severities, target accuracy is 0.872 without adaptation, 0.913 for full fine-tuning, 0.910 for adapters, and 0.919 for replay, so the three methods differ by 0.01 or less on average. Forgetting separates them: averaged over severities it is 0.083 for full fine-tuning, 0.108 for adapters, and 0.020 for replay, and at $s=5$ the source accuracy loss is 0.204, 0.279, and 0.032. In this setup the low-rank adapters did not reduce forgetting relative to full fine-tuning, a possible reason is that the head is also trained and the adapters touch both layers, which we did not test.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig09_shift.pdf}
-\caption{Target accuracy versus shift severity without and with replay adaptation (synthetic pilot).}
+\caption{Target accuracy (left) and source forgetting (right) versus shift severity on synthetic data (mean, 95\% bootstrap CI over 10 seeds).}
 \label{fig:fig09_shift}
 \end{figure}
 
 \section{Discussion and Limitations}
-Corruption severity is a proxy for real shifts. The language shift is between two specific varieties; results may not generalize to other pairs. Replay requires storing source data, which may not be allowed in all deployments.
+Corruption severity is a proxy for real shifts, and the synthetic arm uses an MLP on vectors, not images or text. The adapter result depends on our choice of rank 4, a trainable head, and 300 steps, and it should not be read as a general ranking of adaptation methods. Replay needs stored source samples (200 here). The language shift is between two specific varieties; results may not generalize to other pairs. Replay requires storing source data, which may not be allowed in all deployments.
 
 \section{Conclusion}
-We propose a protocol that measures degradation and forgetting under known image shifts and a realistic English-to-Portuguese language shift, comparing three adaptation methods.
+We propose a protocol that measures degradation and forgetting under known image shifts and a realistic English-to-Portuguese language shift, comparing three adaptation methods. On a synthetic shift of known severity, adaptation recovers most of the lost accuracy at high severity, and replay is the only method that keeps forgetting low. The image corruptions and the Portuguese shift remain pending.
 
 \section*{Acknowledgments}
 The author thanks the Brazilian artificial intelligence community.

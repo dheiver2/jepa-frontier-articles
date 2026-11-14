@@ -10,6 +10,7 @@ Batch upload of the 10 articles to Zenodo as DRAFT depositions.
 Usage:
   ZENODO_TOKEN=... python3 zenodo_upload.py --check     # read-only token test
   ZENODO_TOKEN=... python3 zenodo_upload.py             # create/update drafts
+  ZENODO_TOKEN=... python3 zenodo_upload.py --new-versions  # v2 drafts of the published records (no publish)
   ZENODO_TOKEN=... python3 zenodo_upload.py --publish   # publish the drafts (irreversible)
 """
 import glob
@@ -29,6 +30,7 @@ CREATOR = {
     "affiliation": "Independent Researcher",
     "orcid": "0000-0002-8599-9436",
 }
+NEW_STATE = os.path.join(HERE, "zenodo_new_versions.json")
 
 
 def token():
@@ -72,8 +74,10 @@ def metadata(tex_path):
     abstract = latex_to_text(re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", s, re.S).group(1))
     kw = re.search(r"\\begin\{IEEEkeywords\}(.*?)\\end\{IEEEkeywords\}", s, re.S).group(1)
     keywords = [k.strip() for k in latex_to_text(kw).split(",") if k.strip()]
-    note = ("Preprint. Results in this version come from small-scale pilot experiments; "
-            "the full experimental protocol is described in the text and is pending.")
+    note = ("Preprint. Version 2 adds the simulation arm of the experimental protocol (synthetic data, "
+            "10 seeds, 95% bootstrap intervals); the arms that need real benchmarks remain pending "
+            "and are marked as such in the text. Scripts and result tables: "
+            "https://github.com/dheiver2/jepa-frontier-articles")
     return {
         "upload_type": "publication",
         "publication_type": "preprint",
@@ -130,6 +134,32 @@ def create_drafts():
     print(f"\n{len(st)} drafts recorded in {STATE}. Nothing was published.")
 
 
+def new_versions():
+    """Creates a NEW VERSION DRAFT of each already published record (same concept DOI).
+    Uploads the current PDF and metadata. Does NOT publish."""
+    st = load_state()
+    out = json.load(open(NEW_STATE)) if os.path.exists(NEW_STATE) else {}
+    for name, info in st.items():
+        if name in out:
+            print(f"skip {name}: new-version draft already recorded")
+            continue
+        pdf = os.path.join(HERE, name + ".pdf")
+        tex = os.path.join(HERE, name + ".tex")
+        r = call("POST", f"{API}/deposit/depositions/{info['id']}/actions/newversion")
+        draft = call("GET", r["links"]["latest_draft"])
+        for fl in draft.get("files", []):
+            call("DELETE", fl["links"]["self"])
+        with open(pdf, "rb") as fh:
+            call("PUT", f"{draft['links']['bucket']}/{name}.pdf", raw=fh.read(), ctype="application/octet-stream")
+        md = metadata(tex)
+        md["version"] = "v2"
+        draft = call("PUT", f"{API}/deposit/depositions/{draft['id']}", data={"metadata": md})
+        out[name] = {"id": draft["id"], "draft_url": draft["links"]["html"], "previous_id": info["id"]}
+        json.dump(out, open(NEW_STATE, "w"), indent=2)
+        print(f"new-version draft {name}: {out[name]['draft_url']}")
+    print("\nNothing was published. Review each draft on zenodo.org, then publish by hand.")
+
+
 def publish():
     st = load_state()
     for name, info in st.items():
@@ -143,6 +173,8 @@ def publish():
 if __name__ == "__main__":
     if "--check" in sys.argv:
         check()
+    elif "--new-versions" in sys.argv:
+        new_versions()
     elif "--publish" in sys.argv:
         publish()
     else:

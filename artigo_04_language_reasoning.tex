@@ -14,7 +14,7 @@ ORCID: https://orcid.org/0000-0002-8599-9436}}
 \maketitle
 
 \begin{abstract}
-Autoregressive language models are trained to predict tokens, which couples the objective to surface form. We study a language joint-embedding predictive architecture that predicts the embedding of an answer from the embedding of a question, and that uses paraphrase pairs as an additional signal. We compare it with an autoregressive objective on arithmetic and multi-step reasoning tasks, and on a synthetic arithmetic setting where the correct answer is known by construction. A symbolic pilot shows that a small MLP readout fails beyond depth 2; the language JEPA results are pending.
+Autoregressive language models are trained to predict tokens, which couples the objective to surface form. We study a language joint-embedding predictive architecture that predicts the embedding of an answer from the embedding of a question, and that uses paraphrase pairs as an additional signal. We compare it with an autoregressive objective on arithmetic and multi-step reasoning tasks, and on a synthetic arithmetic setting where the correct answer is known by construction. In a synthetic arithmetic arm (depths 1 to 4, five seeds, a small Transformer trained from scratch for each depth), the language JEPA matches the autoregressive baseline at depth 1 (1.00), is slightly lower at depth 2 (0.77 against 0.80), and all methods are near chance at depths 3 and 4 under this small budget (JEPA 0.22 and 0.13, autoregressive 0.14 and 0.10). The paraphrase term brings no gain. The GSM8K-style benchmarks remain pending.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -58,6 +58,8 @@ where $\mathbf{1}[\cdot]$ is 1 when the predicted answer $\hat y_n$ equals the t
 \section{Experimental Protocol}
 \textbf{Synthetic arithmetic.} Multi-step integer problems with a known solution, with depth $k \in \{1,2,3,4\}$, to measure accuracy as a function of reasoning depth.
 
+\textbf{Synthetic arm reported here.} Questions are token sequences $[\mathrm{CLS},(o_1,v_1),\dots,(o_k,v_k)]$ with three synonyms per operator, numeric or word tokens per value, and optional reordering of the terms, which preserves the answer because the sum is commutative. A paraphrase is another random surface form of the same problem. Training uses the canonical form with probability 0.5 and a random paraphrase otherwise. All methods share a two-layer Transformer encoder (width 64, four heads, CLS pooling), the batch size (128), the optimizer (Adam, learning rate $10^{-3}$), and 1{,}500 optimizer steps, and a separate model is trained for each depth $k\in\{1,2,3,4\}$ and each of five seeds. The autoregressive baseline minimizes the cross-entropy of the one-token answer. The JEPA predicts an 8-dimensional answer embedding from an EMA target encoder over the answer tokens (numeric or word form, momentum 0.99), with variance and covariance terms, and a loss that also moves the online answer encoder toward the prediction; it adds the paraphrase agreement term with weight 1 (``JEPA'') or omits it (``JEPA, no paraphrase''). JEPA predictions are decoded two ways: a linear readout fitted for 1{,}000 steps on the frozen predictions, and nearest answer embedding with no readout. The test has 2{,}000 fresh problems per seed, scored in canonical and paraphrased form. Parameter counts are 71{,}370 for the autoregressive model and 80{,}162 for the JEPA models. Intervals are 95\% bootstrap over the five seeds.
+
 \textbf{Benchmarks.} GSM8K-style word problems in English and Portuguese translations, with exact-match accuracy.
 
 \textbf{Baselines.} Autoregressive fine-tuning with the same backbone and token budget; the same model without paraphrase pairs.
@@ -67,20 +69,40 @@ where $\mathbf{1}[\cdot]$ is 1 when the predicted answer $\hat y_n$ equals the t
 \textbf{Statistics.} Five seeds, 95\% bootstrap intervals, paired tests.
 
 \section{Results}
-This pilot arm uses symbolic arithmetic with a small MLP readout, not a language JEPA. Accuracy is 1.00 at depth $k=1$, 0.51 at $k=2$, and at chance level (about 0.10) for $k\geq 3$. The readout fails beyond shallow depth, so this arm gives no evidence about reasoning. The autoregressive baseline, the paraphrase ablation, and the language benchmarks remain pending.
+We report the synthetic arithmetic arm only. The GSM8K-style word problems in English and Portuguese remain pending. Table~\ref{tab:reasoning} gives exact-match accuracy on paraphrased test questions; the canonical form gives the same values within 0.02 for every method and depth, which shows that all models handle the surface variation used in training.
+
+\begin{table*}[!t]
+\caption{Exact-match accuracy on paraphrased test questions (chance $=0.10$). JEPA columns: linear readout / nearest answer embedding. Five seeds; brackets: 95\% bootstrap CI.}
+\label{tab:reasoning}
+\centering
+\small
+\small
+\begin{tabular}{cccc}
+\hline
+$k$ & Autoregressive & JEPA + paraphrase & JEPA, no paraphrase \\
+\hline
+1 & 1.00 & 1.00 / 1.00 & 1.00 / 1.00 \\
+2 & 0.80 [0.79, 0.81] & 0.77 [0.74, 0.79] / 0.77 [0.74, 0.80] & 0.80 [0.77, 0.81] / 0.79 [0.77, 0.81] \\
+3 & 0.14 [0.09, 0.19] & 0.22 [0.14, 0.30] / 0.22 [0.15, 0.29] & 0.28 [0.23, 0.32] / 0.27 [0.24, 0.29] \\
+4 & 0.10 [0.09, 0.10] & 0.13 [0.10, 0.16] / 0.12 [0.09, 0.16] & 0.13 [0.10, 0.17] / 0.14 [0.11, 0.17] \\
+\hline
+\end{tabular}
+\end{table*}
+
+Depth 1 is solved by every method (accuracy 1.00), so it does not separate them. At depth 2 the autoregressive model reaches 0.80 and the JEPA with the paraphrase term is lower by $0.033$ (paired 95\% CI $-0.052$ to $-0.015$); the JEPA without that term is within the noise of the autoregressive model ($-0.006$, CI $-0.024$ to $0.006$). At depths 3 and 4 all methods are close to chance under this budget. The JEPA variants are nominally higher than the autoregressive model there: at depth 3, JEPA without the paraphrase term is higher by $0.138$ (CI $0.044$ to $0.223$) and JEPA with it by $0.081$ (CI $-0.001$ to $0.170$); at depth 4 the differences are $0.038$ (without) and $0.030$ (with). With five seeds and accuracies between 0.10 and 0.28 we do not read this as evidence of reasoning. The paraphrase term does not help: relative to JEPA without it, the paired difference is $-0.027$ at depth 2 (CI $-0.049$ to $-0.010$), $-0.057$ at depth 3 (CI $-0.137$ to $0.023$), and $-0.009$ at depth 4 (CI $-0.037$ to $0.010$). Decoding by nearest answer embedding gives the same accuracy as the trained readout within 0.01 at every depth, so the readout head does not explain the JEPA accuracy.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig04_reasoning.pdf}
-\caption{Readout accuracy versus reasoning depth on synthetic arithmetic (pilot, MLP). Dotted line: chance level.}
+\caption{Accuracy on paraphrased test questions versus reasoning depth (mean, 95\% bootstrap CI over five seeds). Dotted line: chance level.}
 \label{fig:fig04_reasoning}
 \end{figure}
 
 \section{Discussion and Limitations}
-The readout head adds a decoding step that could account for part of the difference, so the protocol reports results with and without it. Translation may change difficulty, so Portuguese and English are reported separately.
+The readout head adds a decoding step that could account for part of the difference, so the protocol reports results with and without it; in the synthetic arm the two decodings agree. The arm is one small task with a single short training budget (1{,}500 steps), and the low accuracy at depths 3 and 4 reflects that budget and the from-scratch Transformer, not a limit of either objective: we did not try longer training, curricula, or scratchpads, and a longer budget could change the ordering. Five seeds give wide intervals, and the paired differences at depths 3 and 4 are small in absolute terms. The surface variation (synonyms and term order) is easy, since all models already match their canonical accuracy, which leaves little for a paraphrase term to add. Translation may change difficulty, so Portuguese and English are reported separately in the pending benchmark arm.
 
 \section{Conclusion}
-We propose a matched-compute comparison of answer-embedding prediction and autoregressive training on reasoning, with paraphrase supervision as an explicit ablation.
+We propose a matched-compute comparison of answer-embedding prediction and autoregressive training on reasoning, with paraphrase supervision as an explicit ablation. On synthetic modular arithmetic the language JEPA matched the autoregressive baseline at depth 1, was slightly lower at depth 2 with the paraphrase term, and was near chance beyond depth 2 for all methods; the paraphrase term gave no gain. The GSM8K-style benchmarks remain pending.
 
 \section*{Acknowledgments}
 The author thanks the Brazilian artificial intelligence community.

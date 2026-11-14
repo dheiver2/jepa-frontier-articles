@@ -1,0 +1,29 @@
+Experiment 9 (synthetic shift arm), 200 runs, 10 seeds. Mean [95% bootstrap CI].
+Source accuracy before adaptation: 0.959
+
+NoAdapt  s=1  target_acc=0.955 [0.951, 0.958]  forgetting=+0.000 [+0.000, +0.000]
+NoAdapt  s=2  target_acc=0.937 [0.931, 0.942]  forgetting=+0.000 [+0.000, +0.000]
+NoAdapt  s=3  target_acc=0.903 [0.894, 0.911]  forgetting=+0.000 [+0.000, +0.000]
+NoAdapt  s=4  target_acc=0.841 [0.823, 0.858]  forgetting=+0.000 [+0.000, +0.000]
+NoAdapt  s=5  target_acc=0.724 [0.693, 0.753]  forgetting=+0.000 [+0.000, +0.000]
+FullFT   s=1  target_acc=0.924 [0.917, 0.932]  forgetting=+0.035 [+0.029, +0.040]
+FullFT   s=2  target_acc=0.927 [0.922, 0.931]  forgetting=+0.037 [+0.032, +0.043]
+FullFT   s=3  target_acc=0.921 [0.914, 0.930]  forgetting=+0.046 [+0.037, +0.055]
+FullFT   s=4  target_acc=0.901 [0.891, 0.911]  forgetting=+0.093 [+0.073, +0.115]
+FullFT   s=5  target_acc=0.891 [0.879, 0.901]  forgetting=+0.204 [+0.166, +0.246]
+Adapter  s=1  target_acc=0.922 [0.913, 0.931]  forgetting=+0.038 [+0.032, +0.044]
+Adapter  s=2  target_acc=0.925 [0.918, 0.933]  forgetting=+0.040 [+0.034, +0.046]
+Adapter  s=3  target_acc=0.921 [0.912, 0.931]  forgetting=+0.054 [+0.040, +0.070]
+Adapter  s=4  target_acc=0.896 [0.886, 0.906]  forgetting=+0.129 [+0.107, +0.150]
+Adapter  s=5  target_acc=0.886 [0.877, 0.895]  forgetting=+0.279 [+0.217, +0.337]
+Replay   s=1  target_acc=0.945 [0.940, 0.950]  forgetting=+0.012 [+0.008, +0.015]
+Replay   s=2  target_acc=0.937 [0.933, 0.941]  forgetting=+0.015 [+0.011, +0.019]
+Replay   s=3  target_acc=0.927 [0.921, 0.934]  forgetting=+0.018 [+0.013, +0.023]
+Replay   s=4  target_acc=0.903 [0.891, 0.913]  forgetting=+0.026 [+0.021, +0.031]
+Replay   s=5  target_acc=0.883 [0.872, 0.893]  forgetting=+0.032 [+0.026, +0.039]
+
+Mean over severities:
+  NoAdapt  target_acc=0.872  forgetting=+0.000
+  FullFT   target_acc=0.913  forgetting=+0.083
+  Adapter  target_acc=0.910  forgetting=+0.108
+  Replay   target_acc=0.919  forgetting=+0.020

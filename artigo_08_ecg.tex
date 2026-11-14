@@ -14,7 +14,7 @@ ORCID: https://orcid.org/0000-0002-8599-9436}}
 \maketitle
 
 \begin{abstract}
-Labeled electrocardiograms (ECG) are scarce, while unlabeled recordings are abundant. We pretrain a joint-embedding predictive architecture (JEPA) on unlabeled ECG segments by predicting the embeddings of masked leads and segments, and we align the resulting representations with clinical report text. We evaluate on a public 12-lead benchmark with a linear probe and a low-label regime, and on synthetic ECG with controlled anomalies. This is a research protocol, not a clinical tool. A synthetic pilot is too easy to discriminate, so the pretraining results are pending.
+Labeled electrocardiograms (ECG) are scarce, while unlabeled recordings are abundant. We pretrain a joint-embedding predictive architecture (JEPA) on unlabeled ECG segments by predicting the embeddings of masked leads and segments, and we align the resulting representations with clinical report text. We evaluate on a public 12-lead benchmark with a linear probe and a low-label regime, and on synthetic ECG with controlled anomalies. This is a research protocol, not a clinical tool. In a synthetic arm with subtle anomalies and patient-level splits, JEPA pretraining beats masked reconstruction by 0.04 AUROC with 1\% of the labels, but a supervised encoder is clearly better once 10\% or more of the labels are available. The public benchmark and report alignment remain pending.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -43,11 +43,11 @@ where $x_{\mathrm{vis}}$ are the visible leads or segments, $x_{\mathrm{mask}}$ 
 \end{equation}
 where $e_i$ and $t_i$ are the ECG and report embeddings of pair $i$, $\mathrm{sim}$ is cosine similarity, and $\tau$ a temperature. The term pulls matched pairs together and pushes mismatched pairs apart.
 
-The pilot reduces each segment to $16$ principal components, $z=(x-\mu)V_{16}$, where $V_{16}$ holds the top eigenvectors of the unlabeled covariance. The classifier is logistic regression,
+The frozen embedding $z=f_\theta(x)$ is standardized and read by a logistic regression,
 \begin{equation}
 P(y=1\mid z)=\sigma(w^\top z+b),\qquad \sigma(u)=\frac{1}{1+e^{-u}},
 \end{equation}
-and performance is the accuracy $\mathrm{Acc}=\frac{1}{N}\sum_n\mathbf{1}[\hat y_n=y_n]$ on held-out beats, with $\hat y_n=\mathbf{1}[P(y_n=1\mid z_n)\ge 0.5]$.
+and performance is the area under the ROC curve (AUROC) of $P(y=1\mid z)$ on held-out patients, which equals the probability that a randomly chosen abnormal beat receives a higher score than a randomly chosen normal one.
 
 \section{Experimental Protocol}
 \textbf{Public benchmark.} A public 12-lead ECG dataset with diagnostic superclasses. Evaluation uses a linear probe, macro-AUROC, and label fractions of 1\%, 10\%, and 100\%.
@@ -63,20 +63,39 @@ and performance is the accuracy $\mathrm{Acc}=\frac{1}{N}\sum_n\mathbf{1}[\hat y
 \textbf{Ethics.} Only public, de-identified data are used. No clinical use is claimed.
 
 \section{Results}
-This pilot arm uses synthetic sinusoidal beats with a two-class frequency change, not the ECG benchmark. A PCA readout (16 components fit on unlabeled data) and a raw-signal logistic regression both reach 0.995 or higher across label fractions from 2\% to 50\%. The task is too easy to show any benefit of pretraining. The JEPA pretraining, the report alignment, and PTB-XL remain pending.
+We report the synthetic arm only (script \texttt{exp08\_ecg\_sim.py}). Beats have three leads and are generated from a parametric P--Q--R--S--T model with patient-specific amplitude, width, lead mixing, noise, and baseline wander. Half of the abnormal beats carry a morphology anomaly (an ST shift of 0.03 to 0.06 with the R wave at 1.0, and a QRS widened by 12\%) and half a rhythm-like anomaly (P wave attenuated to 25\% and the QRS moved earlier by 0.04 of the beat). Pretraining uses 40{,}000 unlabeled beats from 200 patients. Labeled and test beats come from disjoint patients (100 and 60), and a label fraction is chosen by whole patients, so 1\% is a single patient (about 40 beats). JEPA and masked reconstruction use the same encoder, 1{,}500 steps, and the same masking (50\% of 16-sample tokens). The JEPA arm uses an EMA target and a variance term against collapse. The random and the two pretrained encoders are evaluated with a linear probe; the supervised encoder is trained from scratch on the same labels. All numbers are means over 10 seeds with 95\% bootstrap intervals.
+
+\begin{table*}[!t]
+\caption{Test AUROC on unseen patients (synthetic ECG), mean over 10 seeds with 95\% bootstrap CI.}
+\label{tab:ecg}
+\centering
+\small
+\begin{tabular}{lccc}
+\hline
+Method & 1\% labels & 10\% labels & 100\% labels \\
+\hline
+JEPA        & 0.762 [0.735, 0.785] & 0.831 [0.826, 0.836] & 0.893 [0.888, 0.898] \\
+Masked recon. & 0.721 [0.677, 0.757] & 0.834 [0.826, 0.843] & 0.877 [0.870, 0.884] \\
+Random init.  & 0.740 [0.702, 0.767] & 0.833 [0.823, 0.842] & 0.872 [0.865, 0.880] \\
+Supervised    & 0.775 [0.750, 0.794] & 0.924 [0.917, 0.932] & 0.974 [0.970, 0.978] \\
+\hline
+\end{tabular}
+\end{table*}
+
+The paired difference JEPA minus masked reconstruction is $+0.040$ [$+0.018$, $+0.068$] at 1\% of the labels, $-0.003$ [$-0.009$, $+0.005$] at 10\% (no difference), and $+0.016$ [$+0.011$, $+0.021$] at 100\%. A frozen random encoder is close to both pretrained encoders: at 10\% labels the three are indistinguishable, and at 100\% JEPA is above random initialization by about 0.02 AUROC. The supervised encoder is statistically tied with JEPA at 1\% labels and is far ahead at 10\% (0.924 against 0.831) and 100\% (0.974 against 0.893). The effective rank of the JEPA embedding on test beats is 2.1, against 4.7 for masked reconstruction and 5.4 for the random encoder, so the JEPA representation is low-dimensional even with the variance term.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig08_ecg.pdf}
-\caption{Test accuracy versus labeled fraction for PCA features and raw signal (synthetic pilot).}
+\caption{Test AUROC versus labeled patients on synthetic ECG with subtle anomalies (mean, 95\% bootstrap CI over 10 seeds).}
 \label{fig:fig08_ecg}
 \end{figure}
 
 \section{Discussion and Limitations}
-Public benchmarks may not represent the population of the target use. Report-based alignment may learn reporting style rather than physiology, which the ablation addresses.
+Public benchmarks may not represent the population of the target use. Report-based alignment may learn reporting style rather than physiology, which the ablation addresses. The synthetic arm uses one anomaly design, a small MLP encoder on flattened beats, and 1{,}500 pretraining steps; the advantage of JEPA over masked reconstruction is small and appears only at 1\% and 100\% of the labels, and the supervised baseline wins whenever 10\% or more of the labels exist. These results say nothing about real ECG.
 
 \section{Conclusion}
-We propose JEPA pretraining with report alignment for ECG and a protocol with patient-level splits, low-label regimes, and synthetic anomalies.
+We propose JEPA pretraining with report alignment for ECG and a protocol with patient-level splits, low-label regimes, and synthetic anomalies. On synthetic beats with subtle anomalies, JEPA pretraining gives a small gain over masked reconstruction with very few labels and does not replace supervised training when labels are available. The public 12-lead benchmark and the report alignment remain pending.
 
 \section*{Acknowledgments}
 The author thanks the Brazilian artificial intelligence community.

@@ -1,0 +1,35 @@
+Experiment 10 (simulated-state arm), 240 rows, 10 seeds. Mean [95% bootstrap CI].
+
+linear JEPA   m= 2  true=0.637 control=0.657 sel=-0.020 [-0.078, +0.047]  R2=0.234 [0.231, 0.237]  suff=0.646
+linear JEPA   m= 4  true=0.780 control=0.661 sel=+0.119 [+0.061, +0.176]  R2=0.464 [0.463, 0.466]  suff=0.788
+linear JEPA   m= 8  true=0.904 control=0.664 sel=+0.240 [+0.205, +0.277]  R2=0.861 [0.845, 0.875]  suff=0.890
+linear JEPA   m=16  true=0.938 control=0.672 sel=+0.267 [+0.237, +0.299]  R2=0.939 [0.934, 0.942]  suff=0.928
+linear JEPA   m=32  true=0.959 control=0.682 sel=+0.276 [+0.248, +0.310]  R2=0.961 [0.959, 0.962]  suff=0.942
+linear JEPA   m=64  true=0.964 control=0.698 sel=+0.266 [+0.235, +0.303]  R2=0.966 [0.964, 0.967]  suff=0.947
+linear Random m= 2  true=0.628 control=0.654 sel=-0.026 [-0.086, +0.038]  R2=0.197 [0.186, 0.206]  suff=0.641
+linear Random m= 4  true=0.761 control=0.659 sel=+0.103 [+0.062, +0.155]  R2=0.356 [0.343, 0.369]  suff=0.748
+linear Random m= 8  true=0.818 control=0.659 sel=+0.160 [+0.092, +0.228]  R2=0.598 [0.578, 0.619]  suff=0.813
+linear Random m=16  true=0.889 control=0.666 sel=+0.223 [+0.193, +0.254]  R2=0.823 [0.811, 0.835]  suff=0.882
+linear Random m=32  true=0.927 control=0.673 sel=+0.254 [+0.222, +0.290]  R2=0.920 [0.917, 0.924]  suff=0.916
+linear Random m=64  true=0.953 control=0.687 sel=+0.266 [+0.238, +0.300]  R2=0.958 [0.957, 0.959]  suff=0.938
+
+mlp    JEPA   m= 2  true=0.637 control=0.658 sel=-0.022 [-0.078, +0.046]  R2=0.234 [0.231, 0.237]  suff=0.646
+mlp    JEPA   m= 4  true=0.781 control=0.675 sel=+0.106 [+0.054, +0.157]  R2=0.464 [0.463, 0.466]  suff=0.788
+mlp    JEPA   m= 8  true=0.927 control=0.696 sel=+0.232 [+0.202, +0.269]  R2=0.861 [0.845, 0.875]  suff=0.890
+mlp    JEPA   m=16  true=0.953 control=0.713 sel=+0.240 [+0.209, +0.275]  R2=0.939 [0.934, 0.942]  suff=0.928
+mlp    JEPA   m=32  true=0.963 control=0.720 sel=+0.243 [+0.211, +0.278]  R2=0.961 [0.959, 0.962]  suff=0.942
+mlp    JEPA   m=64  true=0.964 control=0.719 sel=+0.244 [+0.213, +0.282]  R2=0.966 [0.964, 0.967]  suff=0.947
+mlp    Random m= 2  true=0.634 control=0.655 sel=-0.020 [-0.085, +0.046]  R2=0.197 [0.186, 0.206]  suff=0.641
+mlp    Random m= 4  true=0.768 control=0.671 sel=+0.097 [+0.068, +0.128]  R2=0.356 [0.343, 0.371]  suff=0.748
+mlp    Random m= 8  true=0.841 control=0.681 sel=+0.160 [+0.118, +0.199]  R2=0.598 [0.577, 0.620]  suff=0.813
+mlp    Random m=16  true=0.911 control=0.692 sel=+0.219 [+0.193, +0.249]  R2=0.823 [0.811, 0.835]  suff=0.882
+mlp    Random m=32  true=0.940 control=0.707 sel=+0.233 [+0.204, +0.265]  R2=0.920 [0.917, 0.924]  suff=0.916
+mlp    Random m=64  true=0.955 control=0.710 sel=+0.245 [+0.216, +0.278]  R2=0.958 [0.957, 0.959]  suff=0.938
+
+Paired JEPA - Random, fidelity R^2 (mean [95% CI over seeds]) per width:
+  m= 2: +0.037 [+0.029, +0.047]
+  m= 4: +0.109 [+0.095, +0.121]
+  m= 8: +0.262 [+0.234, +0.289]
+  m=16: +0.116 [+0.102, +0.129]
+  m=32: +0.040 [+0.036, +0.044]
+  m=64: +0.008 [+0.007, +0.009]

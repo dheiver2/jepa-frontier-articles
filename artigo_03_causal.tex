@@ -14,7 +14,7 @@ ORCID: https://orcid.org/0000-0002-8599-9436}}
 \maketitle
 
 \begin{abstract}
-A predictor that only captures correlations fails when a variable is intervened upon. We test whether a joint-embedding predictive architecture (JEPA) trained on observational data predicts the correct latent outcome under interventions in simulated causal graphs with known mechanisms. We also test whether causal statements extracted from text can condition the predictor. A pilot arm confirms that confounding biases the correlational predictor; the JEPA results are pending.
+A predictor that only captures correlations fails when a variable is intervened upon. We test whether a joint-embedding predictive architecture (JEPA) trained on observational data predicts the correct latent outcome under interventions in simulated causal graphs with known mechanisms. We also test whether causal statements extracted from text can condition the predictor. In a simulation arm (60 random structural causal models with hidden confounders, linear and nonlinear, 5 to 20 variables), a JEPA trained on observational data has an interventional error of 0.45 (95\% CI 0.33--0.60) in units of the target variance, against 0.39 (0.27--0.54) for correlation-based regression, 0.38 (0.27--0.52) for a VAE, and 0.01 for an oracle with the true structural equation. Almost all of the error comes from interventions on the parent that shares a hidden confounder with the target. The JEPA does not reduce it. The text-derived causal statements remain pending.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -58,25 +58,47 @@ The JEPA predictor is trained on observational sequences with the embedding loss
 
 \textbf{Baselines.} Correlation-based regression, a VAE with the same encoder capacity, and an oracle with access to the true graph.
 
+\textbf{Simulation arm reported here.} Each of 60 structural causal models (10 seeds, $n\in\{5,10,20\}$, linear or nonlinear mechanisms) has a random DAG, noise standard deviation $0.5$, and two hidden confounders. One hidden confounder loads on the target and on one of its parents (the confounded parent); the other loads on two unrelated variables and, more weakly, on the target. The nonlinear mechanism is $x_j=\tanh(u)+0.25\,u+\varepsilon_j$ with $u$ the weighted parent sum plus the confounder loading. Each model is trained on 20{,}000 observational samples to predict the last variable from all the others (2{,}000 Adam steps, batch 256, hidden width 128). The JEPA has a context encoder, a predictor, and an EMA target encoder over the target scalar (momentum 0.99) with a variance term, plus a small value readout fitted on the frozen target latents so that its predictions can be compared in value space. The VAE has the same encoder capacity, hides the target from the encoder and reconstructs all variables. For each parent of the target and 9 values spanning two standard deviations of that parent, the simulator draws 2{,}000 samples under $do(X_i=x)$. The interventional error is the squared difference between the mean prediction and the mean simulated target, averaged over the grid and divided by the target variance. The JEPA is also scored in latent space, as the squared distance between the mean predicted latent and the mean target latent, divided by the total target-latent variance. Structural recovery is the number of wrong incoming edges of the target when parents are read from the model's sensitivity (mean absolute gradient, scaled by the standard deviations, above 0.10). Intervals are 95\% bootstrap over the 60 models.
+
 \textbf{Language component.} Causal statements (for example, ``a higher dose reduces the symptom'') extracted from a text corpus are encoded and used as conditioning. The protocol measures whether conditioning on the correct statement reduces interventional error, and whether a wrong statement increases it.
 
 \textbf{Statistics.} Five seeds, 95\% bootstrap intervals, paired comparisons across methods.
 
 \section{Results}
-This pilot arm tests the motivating bias, not a JEPA. In a linear SCM with a confounder, the observational slope from $X_1$ to $X_n$ rises from 1.00 to 2.00 as the confounding strength $c$ goes from 0 to 2, while the true causal effect is 1.0. The mean squared error of the correlational prediction under $do(X_1)$ grows from 0.00 to 1.33. The JEPA predictor, the interventional-consistency metric, and the text-derived statements remain pending.
+We report the simulation arm only. The text-derived causal statements of Section IV remain pending, and the SHD reported here covers only the incoming edges of the target, not the whole graph. Table~\ref{tab:causal} pools the 60 structural causal models. The oracle, which applies the true structural equation to the observed parents, has an interventional error near zero (0.008), so the error of the learned models is not noise in the simulator.
+
+\begin{table*}[!t]
+\caption{Interventional error (squared, in units of the target variance), pooled over 60 structural causal models, and in-distribution error. Brackets: 95\% bootstrap CI.}
+\label{tab:causal}
+\centering
+\small
+\small
+\begin{tabular}{lccccc}
+\hline
+Method & All parents & Confounded & Other & Obs.\ MSE & Wrong in-edges \\
+\hline
+Regression & 0.39 [0.27, 0.54] & 0.94 [0.70, 1.23] & 0.02 [0.01, 0.04] & 0.22 & 2.6 \\
+VAE & 0.38 [0.27, 0.52] & 0.85 [0.64, 1.10] & 0.06 [0.03, 0.11] & 0.23 & 3.1 \\
+JEPA & 0.45 [0.33, 0.60] & 1.08 [0.83, 1.36] & 0.03 [0.02, 0.05] & 0.26 & 2.7 \\
+Oracle & 0.01 [0.01, 0.01] & 0.01 [0.01, 0.02] & 0.01 [0.00, 0.01] & 0.85 & 0 \\
+\hline
+\end{tabular}
+\end{table*}
+
+All three learned models fit the observational data (observational error 0.22 to 0.26 of the target variance), and all three fail under intervention in the same way. The error is concentrated in interventions on the confounded parent (0.85 to 1.08), and it is small for the other parents (0.02 to 0.06): this is consistent with the backdoor path through the hidden confounder being the main source of bias, since for those parents the confounder is not tied to the intervened variable by construction. The JEPA does not remove the bias. Its paired interventional error is higher than regression by $0.056$ (95\% CI 0.027 to 0.092) and higher than the VAE by $0.068$ (0.033 to 0.109) over the same 60 models. The difference to regression comes from the nonlinear models (0.26 against 0.19 at $n=5$, 0.48 against 0.27 at $n=10$, 0.26 against 0.19 at $n=20$); in the linear models the three learned methods are indistinguishable. The VAE and regression differ by $0.012$ (CI $-0.010$ to 0.033). In latent space, the JEPA has an interventional error of 0.36 (0.27 to 0.47) of the target-latent variance. The sensitivity-based parent recovery is no better for the JEPA (2.7 wrong in-edges, against 2.6 for regression and 3.1 for the VAE). In the linear case the mean error grows with the number of variables (0.42, 0.51, and 0.79 for regression at $n=5,10,20$), but the intervals across structural causal models are wide and overlap.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig03_causal.pdf}
-\caption{Observational slope from $X_1$ to $X_n$ versus confounding strength (pilot, linear SCM). Dashed line: true causal effect.}
+\caption{Interventional error by method for the confounded parent and for the other parents of the target (mean, 95\% bootstrap CI over 60 structural causal models).}
 \label{fig:fig03_causal}
 \end{figure}
 
 \section{Discussion and Limitations}
-The simulated graphs are the ground truth, so the study does not establish causality in real systems. Text-extracted statements may be noisy, and the protocol reports results both with clean and with corrupted statements.
+The simulated graphs are the ground truth, so the study does not establish causality in real systems. The structural causal models are random, small, and built so that one hidden confounder acts on the target and one of its parents, which is the case where an observational predictor must fail: the result shows that a JEPA trained on observational data alone does not escape this failure, not that it is worse in general. The JEPA variant here has a scalar target branch with a variance term and a value readout, and other target designs, larger encoders, or training on interventional data were not tried. The sensitivity-based structural recovery covers only the incoming edges of the target, with an arbitrary threshold of 0.10. Text-extracted statements are not evaluated in this arm and remain pending; they may be noisy, and the protocol reports results both with clean and with corrupted statements.
 
 \section{Conclusion}
-The proposed protocol separates correlation-based prediction from interventional consistency in a setting where the true answer is known, and tests whether text-derived causal statements help.
+The proposed protocol separates correlation-based prediction from interventional consistency in a setting where the true answer is known. In the simulation arm, a JEPA trained on observational data had an interventional error of 0.45, no lower than regression (0.39) or a VAE (0.38), with the error concentrated on interventions on a confounded parent. Whether text-derived causal statements help remains pending.
 
 \section*{Acknowledgments}
 The author thanks the Brazilian artificial intelligence community.

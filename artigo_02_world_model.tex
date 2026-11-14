@@ -14,7 +14,7 @@ ORCID: https://orcid.org/0000-0002-8599-9436}}
 \maketitle
 
 \begin{abstract}
-A world model predicts how the environment evolves, which allows an agent to plan without acting. We study a joint-embedding predictive architecture (JEPA) that predicts future latent states conditioned on actions, and use it inside a model-predictive controller (MPC). We evaluate planning success in simulated control tasks and check whether the latent space preserves the dynamics using known simulator states. Goals are specified in natural language and mapped to target latents through a frozen text encoder. A pilot arm with a linear model saturates at $R^2 \approx 0.998$, so the JEPA results are pending.
+A world model predicts how the environment evolves, which allows an agent to plan without acting. We study a joint-embedding predictive architecture (JEPA) that predicts future latent states conditioned on actions, and use it inside a model-predictive controller (MPC). We evaluate planning success in simulated control tasks and check whether the latent space preserves the dynamics using known simulator states. Goals are specified in natural language and mapped to target latents through a frozen text encoder. In a simulation arm (a torque-limited pendulum with a nonlinear 12-d observation and 16 unpredictable distractor dimensions; 10 seeds), JEPA latents reach a planning success of 0.59 (95\% CI 0.46--0.72), against 0.15 (0.09--0.20) for a reconstruction world model with the same encoder and predictor, 0.08 for random actions, and 0.96 for MPC with the true simulator. The MuJoCo tasks and the language-specified goals remain pending.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -62,21 +62,42 @@ where $i$ indexes test rollouts, $\hat s$ is the predicted state, $s$ the true s
 
 \textbf{Baselines.} Known-model MPC (upper bound), a pixel-reconstruction world model, and random-action planning.
 
+\textbf{Simulation arm reported here.} A torque-limited pendulum, $\theta_{t+1}=\theta_t+\Delta t\,\omega_{t+1}$, $\omega_{t+1}=\omega_t+\Delta t(-4\sin\theta_t-0.5\,\omega_t+4a_t)$ with $a_t\in[-1,1]$ and $\Delta t=0.1$, written for this study (not MuJoCo). The observation is $o_t=[\tanh(M s_t+b)+0.05\,\eta_t,\ \xi_t]$, with a fixed random map to 12 dimensions and 16 distractor dimensions $\xi_t\sim\mathcal{N}(0,I)$ drawn fresh at every step, so they cannot be predicted. Each seed collects 300 random-action episodes of 40 steps. Both learned models use the same encoder (two hidden layers of 128, latent size 16), the same residual latent predictor, a 4-step unrolled loss, 3{,}000 Adam steps with batch 256, and differ only in the objective: JEPA regresses predicted latents on an EMA target encoder (momentum 0.99, stop-gradient) with a variance and covariance term, and the reconstruction model adds a decoder and minimizes observation error. Planning is CEM-MPC (horizon 12, 256 samples, 16 elites, 3 iterations, re-planned every step) over 40 steps and 40 episodes per seed, scoring candidates by the summed squared distance between the predicted latent and the goal latent $f(o_{\mathrm{goal}})$. Goals are angles in $[-1.2,1.2]$ with zero velocity. Success means $|\theta_T-\theta_{\mathrm{goal}}|<0.15$ and $|\omega_T|<0.6$ at the last step. Dynamics fidelity is the held-out $R^2$ of a ridge probe from the latent to $(\theta,\omega)$. Ten seeds; intervals are 95\% bootstrap over seeds.
+
 \section{Results}
-This pilot arm uses a linear dynamics model on a noisy point mass, not a JEPA predictor, and it serves only as a sanity check. Rollout $R^2$ stays at 0.997 to 0.998 for horizons $h=1$ to $10$. The metric saturates, so this arm cannot separate methods. The JEPA world model, the MPC planner, and the language-goal arm remain pending.
+We report the simulation arm only. The MuJoCo tasks and the language-goal arm of Section IV remain pending. Table~\ref{tab:wm} gives planning success, the mean final angle error, and the probe $R^2$ for the angle ($\theta$) and the angular velocity ($\omega$). The earlier linear point-mass pilot saturated at $R^2\approx 0.998$ and could not separate methods; the present arm replaces it.
+
+\begin{table}[!t]
+\caption{Planning in the simulated pendulum (10 seeds, 40 episodes per seed). Success rate, final angle error (rad), and held-out probe $R^2$ from the latent to the true state. Brackets: 95\% bootstrap CI over seeds.}
+\label{tab:wm}
+\centering
+\small
+\begin{tabular}{lccc}
+\hline
+Method & Success & Final error & Probe $R^2$ ($\theta$ / $\omega$) \\
+\hline
+Random actions & 0.08 [0.06, 0.11] & 0.65 [0.61, 0.68] & --- \\
+Reconstruction model & 0.15 [0.09, 0.20] & 0.51 [0.43, 0.59] & 0.88 / 0.90 \\
+JEPA & 0.59 [0.46, 0.72] & 0.16 [0.12, 0.20] & 0.91 / 0.92 \\
+Known model (upper bound) & 0.96 [0.95, 0.98] & 0.03 [0.02, 0.03] & --- \\
+\hline
+\end{tabular}
+\end{table}
+
+With the same encoder, predictor, optimizer budget, and planner, JEPA latents give a higher planning success than the reconstruction model. The paired difference in success is $+0.44$ (95\% CI 0.29 to 0.60 over the 10 seeds). JEPA stays well below the known-model upper bound (0.59 against 0.96), and its success varies a lot across seeds (from 0.23 to 0.88 across the individual seeds). The probe shows a smaller gap: both latents encode the state linearly ($R^2$ between 0.88 and 0.92), and the JEPA probe values are slightly higher (the intervals overlap for $\theta$ and barely separate for $\omega$). Most of the planning difference is therefore not explained by what the latent encodes linearly, and we do not claim a mechanism. The effective rank of the JEPA latent is 15.8 of 16, against 6.1 for the reconstruction model.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig02_world_model.pdf}
-\caption{Rollout $R^2$ versus horizon for the linear pilot model (mean, 95\% CI). Saturated; sanity check only.}
+\caption{Planning success rate in the simulated pendulum (mean, 95\% bootstrap CI over 10 seeds).}
 \label{fig:fig02_world_model}
 \end{figure}
 
 \section{Discussion and Limitations}
-Simulated tasks are low-dimensional. Language goals are limited to a fixed set of instructions in this protocol. The linear probe measures recoverability of state, not sufficiency for control, which is why planning success is reported separately.
+The simulation is a single, low-dimensional system that we wrote ourselves, and its distractor dimensions are unpredictable by construction, which is the case where a reconstruction objective is expected to waste capacity. The result does not show that JEPA beats reconstruction on natural observations, where the discarded detail may matter. We did not tune either objective separately: the reconstruction model has no loss weighting for the distractor dimensions, and a weighted or denoised variant could narrow the gap. The 40 planning episodes per seed and the seed-to-seed spread limit the precision of the success rates. Language goals are not evaluated here and are limited to a fixed set of instructions in this protocol. The linear probe measures recoverability of state, not sufficiency for control, which is why planning success is reported separately.
 
 \section{Conclusion}
-We outline a protocol that tests whether JEPA latents support planning, measured directly by simulator states and by task success under text-specified goals.
+We outline a protocol that tests whether JEPA latents support planning, measured directly by simulator states and by task success under text-specified goals. In the simulation arm, JEPA latents reached a planning success of 0.59, against 0.15 for a matched reconstruction model and 0.96 for the known model, in a system with unpredictable distractors. MuJoCo tasks and language-specified goals remain pending.
 
 \section*{Acknowledgments}
 The author thanks the Brazilian artificial intelligence community.
