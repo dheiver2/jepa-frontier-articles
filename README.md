@@ -4,18 +4,18 @@ Status: **publicados no Zenodo como preprints** (acesso aberto, CC BY 4.0). Os r
 
 ## DOIs no Zenodo
 
-| Artigo | DOI |
+| Artigo | DOI (v2 atual · v1) |
 |---|---|
-| `artigo_01_collapse` | [10.5281/zenodo.23890644](https://doi.org/10.5281/zenodo.23890644) |
-| `artigo_02_world_model` | [10.5281/zenodo.23890647](https://doi.org/10.5281/zenodo.23890647) |
-| `artigo_03_causal` | [10.5281/zenodo.23890650](https://doi.org/10.5281/zenodo.23890650) |
-| `artigo_04_language_reasoning` | [10.5281/zenodo.23890654](https://doi.org/10.5281/zenodo.23890654) |
-| `artigo_05_hierarchical` | [10.5281/zenodo.23890658](https://doi.org/10.5281/zenodo.23890658) |
-| `artigo_06_scaling` | [10.5281/zenodo.23890660](https://doi.org/10.5281/zenodo.23890660) |
-| `artigo_07_uncertainty` | [10.5281/zenodo.23890662](https://doi.org/10.5281/zenodo.23890662) |
-| `artigo_08_ecg` | [10.5281/zenodo.23890664](https://doi.org/10.5281/zenodo.23890664) |
-| `artigo_09_shift` | [10.5281/zenodo.23890666](https://doi.org/10.5281/zenodo.23890666) |
-| `artigo_10_probing` | [10.5281/zenodo.23890668](https://doi.org/10.5281/zenodo.23890668) |
+| `artigo_01_collapse` | v2 [10.5281/zenodo.24223364](https://doi.org/10.5281/zenodo.24223364) · v1 [10.5281/zenodo.23890644](https://doi.org/10.5281/zenodo.23890644) |
+| `artigo_02_world_model` | v2 [10.5281/zenodo.24223365](https://doi.org/10.5281/zenodo.24223365) · v1 [10.5281/zenodo.23890647](https://doi.org/10.5281/zenodo.23890647) |
+| `artigo_03_causal` | v2 [10.5281/zenodo.24223367](https://doi.org/10.5281/zenodo.24223367) · v1 [10.5281/zenodo.23890650](https://doi.org/10.5281/zenodo.23890650) |
+| `artigo_04_language_reasoning` | v2 [10.5281/zenodo.24223370](https://doi.org/10.5281/zenodo.24223370) · v1 [10.5281/zenodo.23890654](https://doi.org/10.5281/zenodo.23890654) |
+| `artigo_05_hierarchical` | v2 [10.5281/zenodo.24223371](https://doi.org/10.5281/zenodo.24223371) · v1 [10.5281/zenodo.23890658](https://doi.org/10.5281/zenodo.23890658) |
+| `artigo_06_scaling` | v2 [10.5281/zenodo.24223374](https://doi.org/10.5281/zenodo.24223374) · v1 [10.5281/zenodo.23890660](https://doi.org/10.5281/zenodo.23890660) |
+| `artigo_07_uncertainty` | v2 [10.5281/zenodo.24223376](https://doi.org/10.5281/zenodo.24223376) · v1 [10.5281/zenodo.23890662](https://doi.org/10.5281/zenodo.23890662) |
+| `artigo_08_ecg` | v2 [10.5281/zenodo.24223378](https://doi.org/10.5281/zenodo.24223378) · v1 [10.5281/zenodo.23890664](https://doi.org/10.5281/zenodo.23890664) |
+| `artigo_09_shift` | v2 [10.5281/zenodo.24223383](https://doi.org/10.5281/zenodo.24223383) · v1 [10.5281/zenodo.23890666](https://doi.org/10.5281/zenodo.23890666) |
+| `artigo_10_probing` | v2 [10.5281/zenodo.24223387](https://doi.org/10.5281/zenodo.24223387) · v1 [10.5281/zenodo.23890668](https://doi.org/10.5281/zenodo.23890668) |
 
 Autor: Dheiver Francisco Santos, Independent Researcher, ORCID [0000-0002-8599-9436](https://orcid.org/0000-0002-8599-9436).
 

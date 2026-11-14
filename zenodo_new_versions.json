@@ -1,0 +1,82 @@
+{
+  "artigo_01_collapse": {
+    "id": 24223364,
+    "draft_url": "https://zenodo.org/deposit/24223364",
+    "previous_id": 23890644,
+    "doi": "10.5281/zenodo.24223364",
+    "record_url": "https://zenodo.org/record/24223364",
+    "conceptdoi": "10.5281/zenodo.23890643"
+  },
+  "artigo_02_world_model": {
+    "id": 24223365,
+    "draft_url": "https://zenodo.org/deposit/24223365",
+    "previous_id": 23890647,
+    "doi": "10.5281/zenodo.24223365",
+    "record_url": "https://zenodo.org/record/24223365",
+    "conceptdoi": "10.5281/zenodo.23890646"
+  },
+  "artigo_03_causal": {
+    "id": 24223367,
+    "draft_url": "https://zenodo.org/deposit/24223367",
+    "previous_id": 23890650,
+    "doi": "10.5281/zenodo.24223367",
+    "record_url": "https://zenodo.org/record/24223367",
+    "conceptdoi": "10.5281/zenodo.23890649"
+  },
+  "artigo_04_language_reasoning": {
+    "id": 24223370,
+    "draft_url": "https://zenodo.org/deposit/24223370",
+    "previous_id": 23890654,
+    "doi": "10.5281/zenodo.24223370",
+    "record_url": "https://zenodo.org/record/24223370",
+    "conceptdoi": "10.5281/zenodo.23890653"
+  },
+  "artigo_05_hierarchical": {
+    "id": 24223371,
+    "draft_url": "https://zenodo.org/deposit/24223371",
+    "previous_id": 23890658,
+    "doi": "10.5281/zenodo.24223371",
+    "record_url": "https://zenodo.org/record/24223371",
+    "conceptdoi": "10.5281/zenodo.23890657"
+  },
+  "artigo_06_scaling": {
+    "id": 24223374,
+    "draft_url": "https://zenodo.org/deposit/24223374",
+    "previous_id": 23890660,
+    "doi": "10.5281/zenodo.24223374",
+    "record_url": "https://zenodo.org/record/24223374",
+    "conceptdoi": "10.5281/zenodo.23890659"
+  },
+  "artigo_07_uncertainty": {
+    "id": 24223376,
+    "draft_url": "https://zenodo.org/deposit/24223376",
+    "previous_id": 23890662,
+    "doi": "10.5281/zenodo.24223376",
+    "record_url": "https://zenodo.org/record/24223376",
+    "conceptdoi": "10.5281/zenodo.23890661"
+  },
+  "artigo_08_ecg": {
+    "id": 24223378,
+    "draft_url": "https://zenodo.org/deposit/24223378",
+    "previous_id": 23890664,
+    "doi": "10.5281/zenodo.24223378",
+    "record_url": "https://zenodo.org/record/24223378",
+    "conceptdoi": "10.5281/zenodo.23890663"
+  },
+  "artigo_09_shift": {
+    "id": 24223383,
+    "draft_url": "https://zenodo.org/deposit/24223383",
+    "previous_id": 23890666,
+    "doi": "10.5281/zenodo.24223383",
+    "record_url": "https://zenodo.org/record/24223383",
+    "conceptdoi": "10.5281/zenodo.23890665"
+  },
+  "artigo_10_probing": {
+    "id": 24223387,
+    "draft_url": "https://zenodo.org/deposit/24223387",
+    "previous_id": 23890668,
+    "doi": "10.5281/zenodo.24223387",
+    "record_url": "https://zenodo.org/record/24223387",
+    "conceptdoi": "10.5281/zenodo.23890667"
+  }
+}
