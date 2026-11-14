@@ -1,6 +1,6 @@
 # Artigos de fronteira sobre JEPA (preprints)
 
-Status: **publicados no Zenodo como preprints** (acesso aberto, CC BY 4.0). Os resultados são de experimentos piloto em pequena escala; o protocolo completo de cada artigo está descrito no texto e pendente. Só o artigo 1 tem um braço experimental completo (simulação, 45 execuções).
+Status: **publicados no Zenodo como preprints** (acesso aberto, CC BY 4.0). Os resultados são de experimentos piloto em pequena escala; o protocolo completo de cada artigo está descrito no texto e pendente. Todos os dez têm o braço de simulação rodado (sintético, 5 a 10 sementes, IC 95% por bootstrap; scripts e tabelas em `experiments/`). Os braços que dependem de benchmarks reais (MuJoCo, GSM8K, PTB-XL, corpus de artigos, linguagem) seguem pendentes. A v1 dos DOIs abaixo traz só o piloto; a v2 (nova versão no mesmo conceito) traz a simulação.
 
 ## DOIs no Zenodo
 
